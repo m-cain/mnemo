@@ -1,0 +1,21 @@
+run:
+  timeout: 5m
+
+linters-settings:
+  goimports:
+    local-prefixes: mnemo/backend
+
+linters:
+  enable:
+    - goimports
+    - golint
+    - unparam
+    - unused
+    - deadcode
+    - errcheck
+    - staticcheck
+    - typecheck
+    - govet
+
+issues:
+  max-issues-per-linter: 0

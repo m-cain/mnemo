@@ -18,21 +18,24 @@ This document outlines the technologies used, the development setup, technical c
 - **Backend Environment:**
 
   - Go 1.24 installed locally
-  - PostgreSQL 17 database setup (local or Docker container)
-  - golang-migrate for handling migrations
-  - pgx v5 library for database connections
+  - PostgreSQL 17 database running in Docker container
+  - Air for hot-reloading during development
+  - Docker Compose for orchestrating services
+  - GitHub Actions for CI/CD pipeline
 
 - **Frontend Environment:**
 
-  - Node.js with npm/yarn for package management
-  - React and TypeScript for frontend development
-  - Local development server using React scripts
+  - Node.js with npm for package management
+  - React 19 and TypeScript for frontend development
+  - Vite as the build tool and development server
+  - ESLint and Prettier for code quality
 
 - **Tooling:**
 
   - Git for version control
-  - Docker for containerization (optional)
-  - VS Code or preferred IDE
+  - Docker and Docker Compose for containerization
+  - VS Code (recommended IDE)
+  - golangci-lint for backend code quality (with configuration issues noted)
 
 ## Technical Constraints
 

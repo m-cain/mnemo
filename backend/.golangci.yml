@@ -1,0 +1,36 @@
+version: "2"
+linters:
+  enable:
+    - unparam
+    - unused
+    - deadcode
+    - errcheck
+    - staticcheck
+    - typecheck
+    - govet
+  exclusions:
+    generated: lax
+    presets:
+      - comments
+      - common-false-positives
+      - legacy
+      - std-error-handling
+    paths:
+      - third_party$
+      - builtin$
+      - examples$
+issues:
+  max-issues-per-linter: 0
+formatters:
+  enable:
+    - goimports
+  settings:
+    goimports:
+      local-prefixes:
+        - mnemo/backend
+  exclusions:
+    generated: lax
+    paths:
+      - third_party$
+      - builtin$
+      - examples$
