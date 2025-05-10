@@ -1,0 +1,2 @@
+-- This is a placeholder for database initialization scripts.
+-- Actual schema migrations will be handled by golang-migrate.

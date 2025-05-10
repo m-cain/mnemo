@@ -20,7 +20,7 @@ This document summarizes the current status of the project, what is working, wha
 ## What's Left to Build
 
 - Remaining system implementation:
-  1. Database schema implementation and migrations
+  1. Database schema implementation and migrations (Initial users table migration created)
   2. Authentication system (user registration, login, API keys)
   3. Core API services for inventory management
   4. Location hierarchy implementation with recursive queries
@@ -44,7 +44,7 @@ This document summarizes the current status of the project, what is working, wha
 
 ## Known Issues
 
-- Schema validation issue with the `.golangci.yml` file in the backend linter configuration
+- Schema validation issue with the `.golangci.yml` file in the backend linter configuration. This issue persists and requires further investigation.
 - Potential challenges identified:
   - Performance optimization for recursive location queries
   - Camera API integration across different devices

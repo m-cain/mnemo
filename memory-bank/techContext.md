@@ -35,7 +35,7 @@ This document outlines the technologies used, the development setup, technical c
   - Git for version control
   - Docker and Docker Compose for containerization
   - VS Code (recommended IDE)
-  - golangci-lint for backend code quality (with configuration issues noted)
+  - golangci-lint for backend code quality (with configuration issues noted that require further investigation)
 
 ## Technical Constraints
 

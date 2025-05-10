@@ -46,7 +46,6 @@ report.[0-9]*.[0-9]*.json
 .DS_Store
 
 # Database
-*.sql
 *.db
 *.sqlite
 *.sqlite3
