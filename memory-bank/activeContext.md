@@ -30,6 +30,11 @@ We are developing an inventory management system with a React frontend and a Go 
   - Enhanced error handling and feedback for auth forms
   - Used the 21st-dev Magic MCP server to generate a sophisticated registration form UI
 
+- Improved LoginPage UI:
+
+  - Modified global styles in `index.css` to ensure the background fills the entire page and the auth card remains centered.
+  - Removed conflicting hardcoded button background styles in `index.css` to fix the invisible button text in light mode.
+
 - Implemented form validation with Zod and react-hook-form:
 
   - Created validation schemas for item forms and quantity adjustments

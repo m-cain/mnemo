@@ -93,6 +93,7 @@
   - Improved overall dashboard organization and layout
 
 - **Extended Form Validation to Authentication Forms**:
+
   - Created Zod validation schemas for login and registration forms
   - Integrated react-hook-form with Zod validation for auth forms
   - Redesigned the registration form with modern card-based layout
@@ -100,6 +101,10 @@
   - Implemented password matching validation for registration
   - Enhanced error handling and feedback for auth forms
   - Used the 21st-dev Magic MCP server to generate a sophisticated registration form UI
+
+- Improved LoginPage UI:
+  - Adjusted global styles in `index.css` to ensure the background fills the entire page and the auth card remains centered.
+  - Removed conflicting hardcoded button background styles in `index.css` to fix the invisible button text in light mode.
 
 ## Known Issues
 
