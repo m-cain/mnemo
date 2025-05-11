@@ -33,7 +33,10 @@ This document summarizes the current status of the project, what is working, wha
 
 - Remaining system implementation:
   - Backend core development for authentication and home/user management is largely complete.
-- Frontend PWA development using React, TypeScript, Tailwind CSS, and Shadcn UI
+- Complete frontend PWA development:
+  - Inventory management views (List, Detail, Create, Edit)
+  - Location management views (List, Detail, Create, Edit)
+  - API key management views
 - Barcode scanning and camera integration
 - Search functionality with NLP capabilities
   - Visual location management system

@@ -42,7 +42,11 @@ This document tracks the current focus of work, recent changes, and immediate ne
 
 ## Next Steps
 
-- Begin developing frontend components using React, TypeScript, Tailwind CSS, and Shadcn UI.
+- Continue frontend development with more views and features:
+  - Implement inventory management views (List, Detail, Create, Edit)
+  - Implement location management views (List, Detail, Create, Edit)
+  - Implement API key management views
+  - Implement barcode scanning using device camera
 
 ## Active Decisions and Considerations
 
