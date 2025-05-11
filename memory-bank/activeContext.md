@@ -6,6 +6,16 @@ We are developing an inventory management system with a React frontend and a Go 
 
 ## Recent Changes
 
+- Extended form validation to authentication forms:
+
+  - Created Zod validation schemas for login and registration forms
+  - Integrated react-hook-form with Zod validation for auth forms
+  - Redesigned the registration form with a modern card-based layout
+  - Added password visibility toggle with eye icons for better user experience
+  - Implemented password matching validation for registration
+  - Enhanced error handling and feedback for auth forms
+  - Used the 21st-dev Magic MCP server to generate a sophisticated registration form UI
+
 - Implemented form validation with Zod and react-hook-form:
 
   - Created validation schemas for item forms and quantity adjustments

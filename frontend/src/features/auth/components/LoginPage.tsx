@@ -1,31 +1,44 @@
+import { zodResolver } from "@hookform/resolvers/zod";
 import { Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { Button } from "../../../components/ui/button";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "../../../components/ui/form";
+import { Input } from "../../../components/ui/input";
 import { apiClient, setAuthToken } from "../../../lib/apiClient";
-import type { AuthResponse, LoginCredentials } from "../../../types/models";
+import type { AuthResponse } from "../../../types/models";
+import type { LoginFormValues } from "../schemas/authValidationSchema";
+import { loginSchema } from "../schemas/authValidationSchema";
 
 export default function LoginPage() {
   const navigate = useNavigate({ from: "/login" });
-  const [credentials, setCredentials] = useState<LoginCredentials>({
-    email: "",
-    password: "",
-  });
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setCredentials((prev) => ({ ...prev, [name]: value }));
-  };
+  // Initialize form with React Hook Form and Zod validation
+  const form = useForm<LoginFormValues>({
+    resolver: zodResolver(loginSchema),
+    defaultValues: {
+      email: "",
+      password: "",
+    },
+  });
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSubmit = async (values: LoginFormValues) => {
     setError(null);
     setIsLoading(true);
 
     try {
       const response = await apiClient.post<AuthResponse>(
         "/auth/login",
-        credentials
+        values
       );
 
       // Store auth token and redirect to dashboard
@@ -56,55 +69,50 @@ export default function LoginPage() {
         </div>
       )}
 
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <div>
-          <label
-            htmlFor="email"
-            className="block text-sm font-medium text-gray-700"
-          >
-            Email
-          </label>
-          <input
-            id="email"
+      <Form {...form}>
+        <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
+          <FormField
+            control={form.control}
             name="email"
-            type="email"
-            autoComplete="email"
-            required
-            value={credentials.email}
-            onChange={handleChange}
-            className="block w-full px-3 py-2 mt-1 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Email</FormLabel>
+                <FormControl>
+                  <Input
+                    type="email"
+                    autoComplete="email"
+                    placeholder="youremail@example.com"
+                    {...field}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
           />
-        </div>
 
-        <div>
-          <label
-            htmlFor="password"
-            className="block text-sm font-medium text-gray-700"
-          >
-            Password
-          </label>
-          <input
-            id="password"
+          <FormField
+            control={form.control}
             name="password"
-            type="password"
-            autoComplete="current-password"
-            required
-            value={credentials.password}
-            onChange={handleChange}
-            className="block w-full px-3 py-2 mt-1 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Password</FormLabel>
+                <FormControl>
+                  <Input
+                    type="password"
+                    autoComplete="current-password"
+                    {...field}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
           />
-        </div>
 
-        <div>
-          <button
-            type="submit"
-            disabled={isLoading}
-            className="flex justify-center w-full px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
-          >
+          <Button type="submit" disabled={isLoading} className="w-full">
             {isLoading ? "Signing in..." : "Sign in"}
-          </button>
-        </div>
-      </form>
+          </Button>
+        </form>
+      </Form>
 
       <div className="text-sm text-center">
         <p className="text-gray-600">
