@@ -9,6 +9,17 @@ const Dashboard = lazy(
   () => import("../features/dashboard/components/DashboardPage")
 );
 
+// Inventory route components
+const ItemList = lazy(
+  () => import("../features/inventory/components/ItemListPage")
+);
+const ItemDetail = lazy(
+  () => import("../features/inventory/components/ItemDetailPage")
+);
+const CreateItemForm = lazy(
+  () => import("../features/inventory/components/CreateItemForm")
+);
+
 // Define layouts
 const AppLayout = lazy(() => import("../components/layout/AppLayout"));
 const AuthLayout = lazy(() => import("../components/layout/AuthLayout"));
@@ -55,10 +66,31 @@ export const dashboardRoute = appLayoutRoute.createRoute({
   component: Dashboard,
 });
 
+// Inventory routes
+export const inventoryRoute = appLayoutRoute.createRoute({
+  path: "/inventory",
+  component: ItemList,
+});
+
+export const inventoryDetailRoute = appLayoutRoute.createRoute({
+  path: "/inventory/$itemId",
+  component: ItemDetail,
+});
+
+export const inventoryCreateRoute = appLayoutRoute.createRoute({
+  path: "/inventory/new",
+  component: CreateItemForm,
+});
+
 // Create the route tree using the routes
 const routeTree = rootRoute.addChildren([
   authLayoutRoute.addChildren([loginRoute, registerRoute]),
-  appLayoutRoute.addChildren([dashboardRoute]),
+  appLayoutRoute.addChildren([
+    dashboardRoute,
+    inventoryRoute,
+    inventoryDetailRoute,
+    inventoryCreateRoute,
+  ]),
 ]);
 
 // Create and export the router

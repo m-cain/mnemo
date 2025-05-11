@@ -2,6 +2,8 @@
  * API client for making requests to the backend
  */
 
+// Types
+
 // Base URL for API endpoints
 const API_BASE_URL =
   import.meta.env.VITE_API_URL || "http://localhost:8080/api";
@@ -131,4 +133,108 @@ export const apiClient = {
 
   delete: <T>(endpoint: string, options?: RequestInit) =>
     request<T>(endpoint, { method: "DELETE", ...options }),
+};
+
+/**
+ * Inventory Item API Functions
+ */
+
+// Get all items for a specific home
+export const getItems = async (homeId: string) => {
+  return apiClient.get<{ data: import("../types/models").Item[] }>(
+    `/homes/${homeId}/items`
+  );
+};
+
+// Get a single item by ID
+export const getItem = async (itemId: string) => {
+  return apiClient.get<{ data: import("../types/models").Item }>(
+    `/items/${itemId}`
+  );
+};
+
+// Create a new item
+export const createItem = async (
+  homeId: string,
+  itemData: Omit<
+    import("../types/models").Item,
+    "id" | "created_at" | "updated_at"
+  >
+) => {
+  return apiClient.post<{ data: import("../types/models").Item }>(
+    `/homes/${homeId}/items`,
+    itemData
+  );
+};
+
+// Update an existing item
+export const updateItem = async (
+  itemId: string,
+  itemData: Partial<import("../types/models").Item>
+) => {
+  return apiClient.put<{ data: import("../types/models").Item }>(
+    `/items/${itemId}`,
+    itemData
+  );
+};
+
+// Update item quantity
+export const updateItemQuantity = async (itemId: string, quantity: number) => {
+  return apiClient.put<{ data: import("../types/models").Item }>(
+    `/items/${itemId}/quantity`,
+    { quantity }
+  );
+};
+
+// Delete an item
+export const deleteItem = async (itemId: string) => {
+  return apiClient.delete<{ success: boolean }>(`/items/${itemId}`);
+};
+
+/**
+ * Item Type API Functions
+ */
+
+// Get all item types for a specific home
+export const getItemTypes = async (homeId: string) => {
+  return apiClient.get<{ data: import("../types/models").ItemType[] }>(
+    `/homes/${homeId}/item-types`
+  );
+};
+
+// Get a single item type by ID
+export const getItemType = async (itemTypeId: string) => {
+  return apiClient.get<{ data: import("../types/models").ItemType }>(
+    `/item-types/${itemTypeId}`
+  );
+};
+
+// Create a new item type
+export const createItemType = async (
+  homeId: string,
+  itemTypeData: Omit<
+    import("../types/models").ItemType,
+    "id" | "created_at" | "updated_at"
+  >
+) => {
+  return apiClient.post<{ data: import("../types/models").ItemType }>(
+    `/homes/${homeId}/item-types`,
+    itemTypeData
+  );
+};
+
+// Update an existing item type
+export const updateItemType = async (
+  itemTypeId: string,
+  itemTypeData: Partial<import("../types/models").ItemType>
+) => {
+  return apiClient.put<{ data: import("../types/models").ItemType }>(
+    `/item-types/${itemTypeId}`,
+    itemTypeData
+  );
+};
+
+// Delete an item type
+export const deleteItemType = async (itemTypeId: string) => {
+  return apiClient.delete<{ success: boolean }>(`/item-types/${itemTypeId}`);
 };
