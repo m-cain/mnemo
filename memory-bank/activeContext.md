@@ -18,13 +18,17 @@ This document tracks the current focus of work, recent changes, and immediate ne
 - Configured linting and formatting tools (ESLint, Prettier for frontend)
 - Established CI/CD pipeline using GitHub Actions
 - Created documentation for development setup
+- Completed database schema migrations for `homes`, `home_users`, and `locations` tables.
+- Implemented core authentication logic (registration and login) in `backend/auth/auth.go`.
+- Set up base backend API structure in `backend/main.go` with Chi router and registered auth routes.
+- Corrected Go module name to "github.com/m-cain/mnemo" and updated import paths.
 
 ## Next Steps
 
-- Begin implementing database schema with migration scripts
-- Develop core authentication system
-- Create base API structure using Chi router
-- Implement user registration and login flows
+- Continue implementing database schema with migration scripts (remaining tables)
+- Develop remaining authentication system features (API keys, user management, etc.)
+- Implement core API services for inventory management
+- Implement location hierarchy logic
 - Set up React frontend with Shadcn components
 
 ## Active Decisions and Considerations
@@ -49,3 +53,4 @@ This document tracks the current focus of work, recent changes, and immediate ne
 - Progressive implementation will enable faster iteration and validation
 - Clear separation between authentication, inventory, and location services will improve maintainability
 - Regular documentation updates in the memory bank will be crucial for project continuity
+- Correct configuration of the Go module path at the project root is essential for resolving local package imports.

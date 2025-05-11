@@ -16,31 +16,39 @@ This document summarizes the current status of the project, what is working, wha
   - Linting and formatting tools configured
   - CI/CD pipeline established with GitHub Actions
   - Development documentation created
+- Database schema migrations for `users`, `homes`, `home_users`, and `locations` tables are created and populated.
+- Core authentication logic (user registration and login with JWT) is implemented.
+- Base backend API structure is set up with Chi router and registered authentication routes.
+- Go module name is correctly configured as "github.com/m-cain/mnemo" at the project root.
 
 ## What's Left to Build
 
 - Remaining system implementation:
-  1. Database schema implementation and migrations (Initial users table migration created)
-  2. Authentication system (user registration, login, API keys)
-  3. Core API services for inventory management
-  4. Location hierarchy implementation with recursive queries
-  5. Frontend PWA with React and Shadcn components
-  6. Barcode scanning and camera integration
-  7. Search functionality with NLP capabilities
-  8. Visual location management system
-  9. Integration with external APIs (e.g., Google Books)
-  10. Performance optimization and security hardening
-  11. Documentation and deployment guides
+  - Database schema implementation and migrations (remaining tables: `items`, `item_types`, `api_keys`)
+  - Authentication system (API keys, user management, etc.)
+  - Core API services for inventory management
+  - Location hierarchy implementation with recursive queries
+  - Frontend PWA with React and Shadcn components
+  - Barcode scanning and camera integration
+  - Search functionality with NLP capabilities
+  - Visual location management system
+  - Integration with external APIs (e.g., Google Books)
+  - Performance optimization and security hardening
+  - Documentation and deployment guides
 
 ## Current Status
 
 - Phase 1 (Project Initialization & Setup) complete
+- Progress made in Phase 2 (Backend Core Development):
+  - Core database schema migrations completed
+  - Core authentication logic implemented
+  - Base API structure established
 - Project repository created with the following components:
   - Go 1.24 backend with initial module setup
   - React/TypeScript frontend with Vite
   - PostgreSQL 17 container in Docker Compose
   - Development environment configuration
-- Ready to begin Phase 2 (Backend Core Development)
+- Ready to continue with Phase 2 and begin Phase 3.
 
 ## Known Issues
 
@@ -58,3 +66,4 @@ This document summarizes the current status of the project, what is working, wha
 - Implementation approach shifted to a more progressive model, focusing on core functionality first
 - Decision to use direct SQL over ORM made based on performance and debugging considerations
 - Frontend architectural decisions guided by the need for PWA capabilities and responsive design
+- Corrected the Go module name to "github.com/m-cain/mnemo" and relocated the `go.mod` file to the project root for proper module management.
