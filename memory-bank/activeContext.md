@@ -6,6 +6,11 @@ We are developing an inventory management system with a React frontend and a Go 
 
 ## Recent Changes
 
+- Added sorting capabilities to the inventory table on ItemListPage:
+  - Implemented column header sorting with visual indicators
+  - Support for sorting by name, item type, location, and quantity
+  - Toggle between ascending and descending order
+  - Visual feedback showing current sort column and direction
 - Enhanced the ItemDetailPage with:
   - Card-based layout with responsive grid design
   - Improved visual organization of item information
@@ -32,6 +37,7 @@ The inventory management UI now includes:
    - Advanced search bar with clear button functionality
    - Item type filtering using a popover component
    - Responsive inventory table with improved styling
+   - Sortable columns with ascending/descending indicators (name, type, location, quantity)
    - Low stock indicators with badges
 
 2. ItemDetailPage:
@@ -51,11 +57,11 @@ The inventory management UI now includes:
 
 ## Next Steps
 
-1. Add sorting capabilities to the inventory table
-2. Create dashboard visualizations (charts, graphs) for inventory analytics
-3. Implement bulk operations (import/export, multi-select delete/edit)
-4. Improve the home selection UI (currently using a placeholder)
-5. Add more comprehensive input validation
+1. Create dashboard visualizations (charts, graphs) for inventory analytics
+2. Implement bulk operations (import/export, multi-select delete/edit)
+3. Improve the home selection UI (currently using a placeholder)
+4. Add more comprehensive input validation
+5. Add pagination for inventory tables with large datasets
 
 ## Technical Decisions
 
@@ -67,6 +73,6 @@ The inventory management UI now includes:
 ## User Experience Focus
 
 - Making inventory status visible at a glance with the stats cards
-- Simplifying search and filtering operations
+- Simplifying search, filtering, and sorting operations
 - Ensuring responsive design works across device sizes
-- Using clear visual indicators for item status (low stock)
+- Using clear visual indicators for item status (low stock, sorting direction)

@@ -1,5 +1,7 @@
 import { Link, useNavigate } from "@tanstack/react-router";
 import {
+  ArrowDown,
+  ArrowUp,
   CircleX,
   Filter,
   MapPin,
@@ -43,6 +45,10 @@ export default function ItemListPage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedTypes, setSelectedTypes] = useState<string[]>([]);
   const inputRef = useRef<HTMLInputElement>(null);
+
+  // Sorting state
+  const [sortField, setSortField] = useState<string>("name");
+  const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
 
   // Fetch items for the selected home
   const {
@@ -111,11 +117,78 @@ export default function ItemListPage() {
     });
   }, [itemsResponse, searchTerm, selectedTypes]);
 
+  // Sort the filtered items
+  const sortedItems = useMemo(() => {
+    if (!filteredItems.length) return [];
+
+    return [...filteredItems].sort((a, b) => {
+      let aValue: string | number | null;
+      let bValue: string | number | null;
+
+      // Get the values based on sort field
+      switch (sortField) {
+        case "name":
+          aValue = a.name.toLowerCase();
+          bValue = b.name.toLowerCase();
+          break;
+        case "type":
+          aValue =
+            itemTypes.find((t) => t.id === a.type_id)?.name?.toLowerCase() ||
+            "";
+          bValue =
+            itemTypes.find((t) => t.id === b.type_id)?.name?.toLowerCase() ||
+            "";
+          break;
+        case "location":
+          aValue = a.location?.name?.toLowerCase() || "";
+          bValue = b.location?.name?.toLowerCase() || "";
+          break;
+        case "quantity":
+          aValue = a.quantity;
+          bValue = b.quantity;
+          break;
+        default:
+          aValue = a.name.toLowerCase();
+          bValue = b.name.toLowerCase();
+      }
+
+      // Handle the sort order
+      if (sortOrder === "asc") {
+        return aValue > bValue ? 1 : aValue < bValue ? -1 : 0;
+      } else {
+        return aValue < bValue ? 1 : aValue > bValue ? -1 : 0;
+      }
+    });
+  }, [filteredItems, sortField, sortOrder, itemTypes]);
+
   // Handle item deletion
   const handleDeleteItem = async (itemId: string) => {
     if (window.confirm("Are you sure you want to delete this item?")) {
       await deleteMutation.mutateAsync(itemId);
     }
+  };
+
+  // Handle column sort
+  const handleSort = (field: string) => {
+    if (sortField === field) {
+      // If the same field is clicked, toggle the sort order
+      setSortOrder(sortOrder === "asc" ? "desc" : "asc");
+    } else {
+      // If a different field is clicked, set it as the new sort field and default to ascending
+      setSortField(field);
+      setSortOrder("asc");
+    }
+  };
+
+  // Helper function to render sort indicator
+  const renderSortIndicator = (field: string) => {
+    if (sortField !== field) return null;
+
+    return sortOrder === "asc" ? (
+      <ArrowUp className="inline h-4 w-4 ml-1" />
+    ) : (
+      <ArrowDown className="inline h-4 w-4 ml-1" />
+    );
   };
 
   // Handle type selection
@@ -344,15 +417,35 @@ export default function ItemListPage() {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Name</TableHead>
-                <TableHead>Type</TableHead>
-                <TableHead>Location</TableHead>
-                <TableHead className="text-right">Quantity</TableHead>
+                <TableHead
+                  onClick={() => handleSort("name")}
+                  className="cursor-pointer hover:bg-gray-50"
+                >
+                  Name {renderSortIndicator("name")}
+                </TableHead>
+                <TableHead
+                  onClick={() => handleSort("type")}
+                  className="cursor-pointer hover:bg-gray-50"
+                >
+                  Type {renderSortIndicator("type")}
+                </TableHead>
+                <TableHead
+                  onClick={() => handleSort("location")}
+                  className="cursor-pointer hover:bg-gray-50"
+                >
+                  Location {renderSortIndicator("location")}
+                </TableHead>
+                <TableHead
+                  onClick={() => handleSort("quantity")}
+                  className="cursor-pointer hover:bg-gray-50 text-right"
+                >
+                  Quantity {renderSortIndicator("quantity")}
+                </TableHead>
                 <TableHead className="text-right">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {filteredItems.map((item) => (
+              {sortedItems.map((item) => (
                 <TableRow key={item.id}>
                   <TableCell>
                     <div className="font-medium">{item.name}</div>
@@ -419,10 +512,17 @@ export default function ItemListPage() {
 
       {/* Pagination info */}
       {filteredItems.length > 0 && (
-        <div className="flex items-center justify-end mt-4">
+        <div className="flex items-center justify-between mt-4">
           <div className="text-sm text-gray-500">
-            Showing <span className="font-medium">{filteredItems.length}</span>{" "}
-            of{" "}
+            {sortField !== "name" && (
+              <span>
+                Sorted by: <strong>{sortField}</strong> (
+                {sortOrder === "asc" ? "ascending" : "descending"})
+              </span>
+            )}
+          </div>
+          <div className="text-sm text-gray-500">
+            Showing <span className="font-medium">{sortedItems.length}</span> of{" "}
             <span className="font-medium">
               {itemsResponse?.data?.length || 0}
             </span>{" "}

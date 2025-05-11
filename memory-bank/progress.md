@@ -14,6 +14,12 @@
 
 ## Recently Completed
 
+- **Implemented Inventory Table Sorting**:
+  - Added sortable columns with visual indicators for sort direction
+  - Implemented client-side sorting for name, type, location, and quantity
+  - Added toggle between ascending and descending order
+  - Included visual feedback showing current sort state
+  - Optimized sorting with useMemo for performance
 - **Enhanced Item Detail Page**:
   - Redesigned with card-based layout and responsive grid
   - Improved visual organization of item information
@@ -38,10 +44,10 @@
 
 ## Current Development Focus
 
-- Adding sorting capabilities to the inventory tables
 - Creating visualizations for inventory analytics
 - Implementing bulk operations (import/export, batch editing)
 - Improving home selection UI
+- Adding pagination for large datasets
 
 ## Known Issues
 
