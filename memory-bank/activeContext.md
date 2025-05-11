@@ -23,12 +23,17 @@ This document tracks the current focus of work, recent changes, and immediate ne
 - Set up base backend API structure in `backend/main.go` with Chi router and registered auth routes.
 - Corrected Go module name to "github.com/m-cain/mnemo" and updated import paths.
 - Completed database schema migrations for `item_types`, `items`, and `api_keys` tables.
+- Implemented backend API key management (generation, listing, revocation).
+- Implemented backend home and home user management (CRUD for homes, listing home users, inviting users, updating roles, removing users).
+- Refactored context key usage in backend to use defined constants.
 
 ## Next Steps
 
-- Database schema implementation and migrations are complete.
-- Develop remaining authentication system features (API keys, user management, etc.)
-- Implement core API services for inventory management
+- Backend core development for authentication and home/user management is largely complete.
+- Implement core API services for inventory management.
+- Implement location hierarchy logic.
+- **Frontend setup is currently blocked by an environment issue preventing `tailwindcss` execution.** Need to resolve this before proceeding with Shadcn setup and frontend component development.
+- Set up React frontend with Shadcn components (blocked).
 - Implement location hierarchy logic
 - Set up React frontend with Shadcn components
 

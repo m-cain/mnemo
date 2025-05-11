@@ -21,13 +21,15 @@ This document summarizes the current status of the project, what is working, wha
 - Core authentication logic (user registration and login with JWT) is implemented.
 - Base backend API structure is set up with Chi router and registered authentication routes.
 - Go module name is correctly configured as "github.com/m-cain/mnemo" at the project root.
+- Backend API key management (generation, listing, revocation) is implemented.
+- Backend home and home user management (CRUD for homes, listing home users, inviting users, updating roles, removing users) is implemented.
+- Context key usage in backend is refactored to use defined constants.
 
 ## What's Left to Build
 
 - Remaining system implementation:
-  - Database schema implementation and migrations are complete.
-  - Authentication system (API keys, user management, etc.)
-  - Core API services for inventory management
+  - Backend core development for authentication and home/user management is largely complete.
+  - Implement core API services for inventory management.
   - Location hierarchy implementation with recursive queries
   - Frontend PWA with React and Shadcn components
   - Barcode scanning and camera integration
@@ -53,6 +55,7 @@ This document summarizes the current status of the project, what is working, wha
 
 ## Known Issues
 
+- **Frontend setup is currently blocked by an environment issue preventing `tailwindcss` execution.** This needs to be resolved to proceed with Shadcn setup and frontend component development.
 - Schema validation issue with the `.golangci.yml` file in the backend linter configuration. This issue persists and requires further investigation.
 - Potential challenges identified:
   - Performance optimization for recursive location queries

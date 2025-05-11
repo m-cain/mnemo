@@ -124,3 +124,7 @@ Start[Update Process]
 Note: When triggered by **update memory bank**, I MUST review every memory bank file, even if some don't require updates. Focus particularly on activeContext.md and progress.md as they track current state.
 
 REMEMBER: After every memory reset, I begin completely fresh. The Memory Bank is my only link to previous work. It must be maintained with precision and clarity, as my effectiveness depends entirely on its accuracy.
+
+## Coding Style Rules
+
+- **Go Import Comments**: Do not add comments directly after a Go import statement that only describe the imported package (e.g., `import "fmt" // Import fmt`). Such comments are redundant and should be avoided.

@@ -1,14 +1,19 @@
 package auth
 
 import (
+	"context"
 	"database/sql"
 	"encoding/json"
+	"fmt"
 	"net/http"
+	"strings"
 	"time"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/google/uuid"
+	"github.com/jackc/pgx/v5/pgxpool"
+	"github.com/m-cain/mnemo/backend/contextkey"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -33,17 +38,68 @@ type LoginResponse struct {
 	Token string `json:"token"`
 }
 
+// AuthService handles user authentication and authorization.
 type AuthService struct {
-	db *sql.DB
+	db            *pgxpool.Pool
+	apiKeyService *APIKeyService // Inject APIKeyService
 }
 
-func NewAuthService(db *sql.DB) *AuthService {
-	return &AuthService{db: db}
+// NewAuthService creates a new AuthService.
+func NewAuthService(db *pgxpool.Pool, apiKeyService *APIKeyService) *AuthService {
+	return &AuthService{db: db, apiKeyService: apiKeyService}
 }
 
+// RegisterRoutes registers authentication routes.
 func (s *AuthService) RegisterRoutes(r chi.Router) {
 	r.Post("/register", s.handleRegister)
 	r.Post("/login", s.handleLogin)
+}
+
+// AuthMiddleware is a middleware to authenticate requests using JWT or API Key.
+func (s *AuthService) AuthMiddleware(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		// Check for JWT in Authorization header (Bearer token)
+		authHeader := r.Header.Get("Authorization")
+		if authHeader != "" {
+			parts := strings.SplitN(authHeader, " ", 2)
+			if len(parts) == 2 && parts[0] == "Bearer" {
+				tokenString := parts[1]
+				token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
+					if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+						return nil, fmt.Errorf("Unexpected signing method: %v", token.Header["alg"]) // Use fmt.Errorf
+					}
+					return jwtSecret, nil
+				})
+
+				if err == nil && token.Valid {
+					if claims, ok := token.Claims.(jwt.MapClaims); ok {
+						userID, ok := claims["sub"].(string)
+						if ok {
+							// Set userID in context
+							ctx := context.WithValue(r.Context(), contextkey.UserIDKey, userID) // Use contextkey.UserIDKey
+							next.ServeHTTP(w, r.WithContext(ctx))
+							return
+						}
+					}
+				}
+			}
+		}
+
+		// Check for API Key in X-API-Key header
+		apiKeyHeader := r.Header.Get("X-API-Key")
+		if apiKeyHeader != "" {
+			user, err := s.apiKeyService.ValidateAPIKey(r.Context(), apiKeyHeader)
+			if err == nil {
+				// Set userID in context
+				ctx := context.WithValue(r.Context(), contextkey.UserIDKey, user.ID.String()) // Use contextkey.UserIDKey and user.ID
+				next.ServeHTTP(w, r.WithContext(ctx))
+				return
+			}
+		}
+
+		// If neither JWT nor API Key is valid, return Unauthorized
+		http.Error(w, "Unauthorized", http.StatusUnauthorized)
+	})
 }
 
 func (s *AuthService) handleRegister(w http.ResponseWriter, r *http.Request) {
@@ -77,7 +133,8 @@ func (s *AuthService) handleRegister(w http.ResponseWriter, r *http.Request) {
 		RETURNING id, email
 	`
 	var resp RegisterResponse
-	err = s.db.QueryRow(query, userID, req.Email, hashedPassword, createdAt, updatedAt).Scan(&resp.ID, &resp.Email)
+	// Use dbPool.QueryRow
+	err = s.db.QueryRow(r.Context(), query, userID, req.Email, hashedPassword, createdAt, updatedAt).Scan(&resp.ID, &resp.Email)
 	if err != nil {
 		// TODO: Handle duplicate email error specifically
 		http.Error(w, "Failed to create user", http.StatusInternalServerError)
@@ -106,7 +163,8 @@ func (s *AuthService) handleLogin(w http.ResponseWriter, r *http.Request) {
 	var userID uuid.UUID
 	var hashedPassword string
 	query := `SELECT id, password_hash FROM users WHERE email = $1`
-	err := s.db.QueryRow(query, req.Email).Scan(&userID, &hashedPassword)
+	// Use dbPool.QueryRow
+	err := s.db.QueryRow(r.Context(), query, req.Email).Scan(&userID, &hashedPassword)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			http.Error(w, "Invalid credentials", http.StatusUnauthorized)
