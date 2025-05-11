@@ -13,12 +13,15 @@ import (
 	"github.com/golang-migrate/migrate/v4"
 	migrate_postgres "github.com/golang-migrate/migrate/v4/database/postgres" // Import with alias
 	_ "github.com/golang-migrate/migrate/v4/source/file"
+	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
 	_ "github.com/jackc/pgx/v5/stdlib"
 	"github.com/m-cain/mnemo/backend/auth"
 	"github.com/m-cain/mnemo/backend/contextkey"
 	"github.com/m-cain/mnemo/backend/home"
+	"github.com/m-cain/mnemo/backend/inventory"
+	"github.com/m-cain/mnemo/backend/models"
 )
 
 func main() {
@@ -70,6 +73,7 @@ func main() {
 	apiKeyService := auth.NewAPIKeyService(dbPool)            // Initialize APIKeyService
 	authService := auth.NewAuthService(dbPool, apiKeyService) // Pass dbPool and apiKeyService
 	homeService := home.NewHomeService(dbPool)                // Initialize HomeService
+	inventoryService := inventory.NewInventoryService(dbPool) // Initialize InventoryService
 
 	// Setup router
 	r := chi.NewRouter()
@@ -143,6 +147,25 @@ func main() {
 				}
 				w.WriteHeader(http.StatusNoContent)
 			})
+		})
+
+		// Inventory Routes (Protected)
+		r.Route("/items", func(r chi.Router) {
+			r.Use(authService.AuthMiddleware)    // Protect inventory routes
+			r.Use(homeIDMiddleware(homeService)) // Middleware to check home membership and set homeID in context
+
+			r.Get("/", listItemsHandler(inventoryService))
+			r.Post("/", createItemHandler(inventoryService))
+			// TODO: Add other item routes (GET by ID, PUT, DELETE, PUT quantity)
+		})
+
+		r.Route("/item-types", func(r chi.Router) {
+			r.Use(authService.AuthMiddleware) // Protect item type routes
+			r.Get("/", listItemTypesHandler(inventoryService))
+			r.Post("/", createItemTypeHandler(inventoryService))
+			r.Get("/{itemTypeID}", getItemTypeHandler(inventoryService))
+			r.Put("/{itemTypeID}", updateItemTypeHandler(inventoryService))
+			r.Delete("/{itemTypeID}", deleteItemTypeHandler(inventoryService))
 		})
 
 		// Home Routes (Protected)
@@ -339,4 +362,241 @@ func main() {
 	}
 	log.Printf("Server starting on port %s\n", port)
 	log.Fatal(http.ListenAndServe(":"+port, r))
+}
+
+// homeIDMiddleware is a middleware that extracts the homeID from the URL
+// and checks if the authenticated user is a member of that home.
+// If the user is a member, it adds the homeID and user's role to the request context.
+func homeIDMiddleware(homeService *home.HomeService) func(next http.Handler) http.Handler {
+	return func(next http.Handler) http.Handler {
+		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			homeIDStr := chi.URLParam(r, "homeID")
+			if homeIDStr == "" {
+				// If homeID is not in the URL, proceed without adding to context
+				next.ServeHTTP(w, r)
+				return
+			}
+
+			userID, ok := r.Context().Value(contextkey.UserIDKey).(string)
+			if !ok {
+				// UserID not found in context, AuthMiddleware should have handled this
+				http.Error(w, "Unauthorized", http.StatusUnauthorized)
+				return
+			}
+
+			// Check if the user is a member of the home
+			role, err := homeService.CheckHomeMembership(r.Context(), homeIDStr, userID)
+			if err != nil {
+				log.Printf("Error checking home membership in middleware: %v", err)
+				http.Error(w, "Internal server error", http.StatusInternalServerError)
+				return
+			}
+			if role == "" {
+				// User is not a member of this home
+				http.Error(w, "Forbidden", http.StatusForbidden)
+				return
+			}
+
+			// Add homeID and user role to the context
+			ctx := context.WithValue(r.Context(), contextkey.HomeIDKey, homeIDStr)
+			ctx = context.WithValue(ctx, contextkey.UserRoleKey, role)
+
+			next.ServeHTTP(w, r.WithContext(ctx))
+		})
+	}
+}
+
+// listItemsHandler returns a http.HandlerFunc that lists items for a given home.
+func listItemsHandler(inventoryService *inventory.InventoryService) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		homeIDStr, ok := r.Context().Value(contextkey.HomeIDKey).(string)
+		if !ok {
+			http.Error(w, "Home ID not found in context", http.StatusInternalServerError)
+			return
+		}
+
+		_, err := uuid.Parse(homeIDStr) // Use blank identifier as homeID is not used directly yet
+		if err != nil {
+			http.Error(w, "Invalid Home ID format", http.StatusBadRequest)
+			return
+		}
+
+		items, err := inventoryService.ListItems(r.Context(), homeID)
+		if err != nil {
+			http.Error(w, "Failed to list items", http.StatusInternalServerError)
+			log.Printf("Error listing items: %v", err)
+			return
+		}
+
+		json.NewEncoder(w).Encode(items)
+	}
+}
+
+// listItemTypesHandler returns a http.HandlerFunc that lists all item types.
+func listItemTypesHandler(inventoryService *inventory.InventoryService) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		itemTypes, err := inventoryService.ListItemTypes(r.Context())
+		if err != nil {
+			http.Error(w, "Failed to list item types", http.StatusInternalServerError)
+			log.Printf("Error listing item types: %v", err)
+			return
+		}
+
+		json.NewEncoder(w).Encode(itemTypes)
+	}
+}
+
+// createItemTypeHandler returns a http.HandlerFunc that creates a new item type.
+func createItemTypeHandler(inventoryService *inventory.InventoryService) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		var req struct {
+			Name string `json:"name"`
+		}
+		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+			http.Error(w, "Invalid request body", http.StatusBadRequest)
+			return
+		}
+
+		itemType, err := inventoryService.CreateItemType(r.Context(), req.Name)
+		if err != nil {
+			http.Error(w, "Failed to create item type", http.StatusInternalServerError)
+			log.Printf("Error creating item type: %v", err)
+			return
+		}
+
+		w.WriteHeader(http.StatusCreated)
+		json.NewEncoder(w).Encode(itemType)
+	}
+}
+
+// getItemTypeHandler returns a http.HandlerFunc that retrieves an item type by ID.
+func getItemTypeHandler(inventoryService *inventory.InventoryService) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		itemTypeIDStr := chi.URLParam(r, "itemTypeID")
+		itemTypeID, err := uuid.Parse(itemTypeIDStr)
+		if err != nil {
+			http.Error(w, "Invalid Item Type ID format", http.StatusBadRequest)
+			return
+		}
+
+		itemType, err := inventoryService.GetItemTypeByID(r.Context(), itemTypeID)
+		if err != nil {
+			if err == pgx.ErrNoRows {
+				http.Error(w, "Item type not found", http.StatusNotFound)
+			} else {
+				http.Error(w, "Failed to get item type", http.StatusInternalServerError)
+				log.Printf("Error getting item type: %v", err)
+			}
+			return
+		}
+
+		if itemType == nil {
+			http.Error(w, "Item type not found", http.StatusNotFound)
+			return
+		}
+
+		json.NewEncoder(w).Encode(itemType)
+	}
+}
+
+// updateItemTypeHandler returns a http.HandlerFunc that updates an existing item type.
+func updateItemTypeHandler(inventoryService *inventory.InventoryService) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		itemTypeIDStr := chi.URLParam(r, "itemTypeID")
+		itemTypeID, err := uuid.Parse(itemTypeIDStr)
+		if err != nil {
+			http.Error(w, "Invalid Item Type ID format", http.StatusBadRequest)
+			return
+		}
+
+		var req struct {
+			Name string `json:"name"`
+		}
+		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+			http.Error(w, "Invalid request body", http.StatusBadRequest)
+			return
+		}
+
+		itemType, err := inventoryService.UpdateItemType(r.Context(), itemTypeID, req.Name)
+		if err != nil {
+			if err == pgx.ErrNoRows {
+				http.Error(w, "Item type not found", http.StatusNotFound)
+			} else {
+				http.Error(w, "Failed to update item type", http.StatusInternalServerError)
+				log.Printf("Error updating item type: %v", err)
+			}
+			return
+		}
+
+		if itemType == nil {
+			http.Error(w, "Item type not found", http.StatusNotFound)
+			return
+		}
+
+		json.NewEncoder(w).Encode(itemType)
+	}
+}
+
+// deleteItemTypeHandler returns a http.HandlerFunc that deletes an item type by ID.
+func deleteItemTypeHandler(inventoryService *inventory.InventoryService) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		itemTypeIDStr := chi.URLParam(r, "itemTypeID")
+		itemTypeID, err := uuid.Parse(itemTypeIDStr)
+		if err != nil {
+			http.Error(w, "Invalid Item Type ID format", http.StatusBadRequest)
+			return
+		}
+
+		err = inventoryService.DeleteItemType(r.Context(), itemTypeID)
+		if err != nil {
+			if err == pgx.ErrNoRows {
+				http.Error(w, "Item type not found", http.StatusNotFound)
+			} else {
+				http.Error(w, "Failed to delete item type", http.StatusInternalServerError)
+				log.Printf("Error deleting item type: %v", err)
+			}
+			return
+		}
+
+		w.WriteHeader(http.StatusNoContent)
+	}
+}
+
+// createItemHandler returns a http.HandlerFunc that creates a new item.
+func createItemHandler(inventoryService *inventory.InventoryService) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		homeIDStr, ok := r.Context().Value(contextkey.HomeIDKey).(string)
+		if !ok {
+			http.Error(w, "Home ID not found in context", http.StatusInternalServerError)
+			return
+		}
+
+		homeID, err := uuid.Parse(homeIDStr)
+		if err != nil {
+			http.Error(w, "Invalid Home ID format", http.StatusBadRequest)
+			return
+		}
+
+		var req models.Item
+		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+			http.Error(w, "Invalid request body", http.StatusBadRequest)
+			return
+		}
+
+		// Ensure the item is associated with the home from the context
+		// req.HomeID = homeID // Items table does not have home_id directly, it's linked via location
+
+		// For now, we'll assume location_id is provided in the request body
+		// TODO: Implement proper location handling and validation
+
+		createdItem, err := inventoryService.CreateItem(r.Context(), req)
+		if err != nil {
+			http.Error(w, "Failed to create item", http.StatusInternalServerError)
+			log.Printf("Error creating item: %v", err)
+			return
+		}
+
+		w.WriteHeader(http.StatusCreated)
+		json.NewEncoder(w).Encode(createdItem)
+	}
 }

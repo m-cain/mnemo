@@ -7,6 +7,7 @@ This document tracks the current focus of work, recent changes, and immediate ne
 - Implementing backend core functionality for the Mnemo home inventory tracking system
 - Setting up database schema and migrations
 - Developing authentication system
+- Implementing inventory management APIs
 - Creating frontend components for core functionality
 
 ## Recent Changes
@@ -26,6 +27,9 @@ This document tracks the current focus of work, recent changes, and immediate ne
 - Implemented backend API key management (generation, listing, revocation).
 - Implemented backend home and home user management (CRUD for homes, listing home users, inviting users, updating roles, removing users).
 - Refactored context key usage in backend to use defined constants.
+- Implemented backend CRUD operations for ItemType (List, Create, Get by ID, Update, Delete).
+- Started implementing backend CRUD operations for Item (Implemented Create and Get by ID).
+- Integrated new inventory handlers and routes into `backend/main.go`.
 
 ## Next Steps
 
@@ -33,9 +37,11 @@ This document tracks the current focus of work, recent changes, and immediate ne
 - Implement core API services for inventory management.
 - Implement location hierarchy logic.
 - **Frontend setup is currently blocked by an environment issue preventing `tailwindcss` execution.** Need to resolve this before proceeding with Shadcn setup and frontend component development.
-- Set up React frontend with Shadcn components (blocked).
-- Implement location hierarchy logic
-- Set up React frontend with Shadcn components
+- **Resolve frontend `tailwindcss` environment issue (Highest Priority).** This is blocking Shadcn setup and frontend component development.
+- If frontend remains blocked, continue backend development:
+  - Implement remaining CRUD operations for Item (Update, Delete).
+  - Implement location hierarchy logic.
+- Investigate backend `.golangci.yml` schema validation issue.
 
 ## Active Decisions and Considerations
 
@@ -60,3 +66,4 @@ This document tracks the current focus of work, recent changes, and immediate ne
 - Clear separation between authentication, inventory, and location services will improve maintainability
 - Regular documentation updates in the memory bank will be crucial for project continuity
 - Correct configuration of the Go module path at the project root is essential for resolving local package imports.
+- Encountered a persistent compiler error (`undefined: homeID`) in the `listItemsHandler` function in `backend/main.go` despite correct parsing and top-level import. This issue needs further investigation if it persists during build/testing.

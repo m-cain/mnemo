@@ -24,12 +24,14 @@ This document summarizes the current status of the project, what is working, wha
 - Backend API key management (generation, listing, revocation) is implemented.
 - Backend home and home user management (CRUD for homes, listing home users, inviting users, updating roles, removing users) is implemented.
 - Context key usage in backend is refactored to use defined constants.
+- Backend CRUD operations for ItemType (List, Create, Get by ID, Update, Delete) are implemented.
+- Backend CRUD operations for Item (Create and Get by ID) are implemented.
 
 ## What's Left to Build
 
 - Remaining system implementation:
   - Backend core development for authentication and home/user management is largely complete.
-  - Implement core API services for inventory management.
+  - Implement remaining core API services for inventory management (Update and Delete for Item).
   - Location hierarchy implementation with recursive queries
   - Frontend PWA with React and Shadcn components
   - Barcode scanning and camera integration
@@ -57,6 +59,7 @@ This document summarizes the current status of the project, what is working, wha
 
 - **Frontend setup is currently blocked by an environment issue preventing `tailwindcss` execution.** This needs to be resolved to proceed with Shadcn setup and frontend component development.
 - Schema validation issue with the `.golangci.yml` file in the backend linter configuration. This issue persists and requires further investigation.
+- Persistent compiler error (`undefined: homeID`) in the `listItemsHandler` function in `backend/main.go` despite correct parsing and top-level import. This issue needs further investigation if it persists during build/testing.
 - Potential challenges identified:
   - Performance optimization for recursive location queries
   - Camera API integration across different devices

@@ -64,7 +64,8 @@ This document provides a detailed breakdown of the project implementation phases
   - User management API
   - Home management API
   - Location hierarchy API
-  - Item management API
+  - Item management API (List, Create, Get by ID implemented)
+  - Item Type management API (List, Create, Get by ID, Update, Delete implemented)
   - Search and filtering API
 - Create services for business logic:
   - Auth service
