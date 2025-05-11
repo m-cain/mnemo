@@ -9,7 +9,7 @@ This document outlines the technologies used, the development setup, technical c
 - **Database:** PostgreSQL 17
 - **Database Access:** pgx v5
 - **Migration Tool:** golang-migrate
-- **Frontend:** React with TypeScript
+- **Frontend:** React with TypeScript, TanStack Query for data fetching, and TanStack Router for routing
 - **UI Components:** Shadcn
 - **Styling:** Tailwind CSS
 - **Frontend Deployment:** Progressive Web App (PWA)

@@ -128,3 +128,4 @@ REMEMBER: After every memory reset, I begin completely fresh. The Memory Bank is
 ## Coding Style Rules
 
 - **Go Import Comments**: Do not add comments directly after a Go import statement that only describe the imported package (e.g., `import "fmt" // Import fmt`). Such comments are redundant and should be avoided.
+- **Frontend Dependencies**: Always use the latest versions of TanStack Query and TanStack Router.

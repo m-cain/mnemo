@@ -34,7 +34,7 @@ With Phase 1 complete, we have established the foundational infrastructure for t
 - **Stateless REST API:** Emphasis on stateless interactions for scalability and ease of integration.
 - **Command Query Responsibility Segregation (CQRS):** Clear delineation between read (queries) and write (commands) operations in business logic.
 - **Dependency Injection:** Used to enhance testability and modularity in backend services.
-- **Component-Based UI Architecture:** React components structured clearly, with state management and logic encapsulation for maintainability.
+- **Component-Based UI Architecture:** React components structured clearly, with state management, data fetching using TanStack Query, and routing handled by TanStack Router for maintainability and performance.
 
 ## Component Relationships
 

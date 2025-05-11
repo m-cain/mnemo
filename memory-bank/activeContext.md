@@ -51,6 +51,16 @@ This document tracks the current focus of work, recent changes, and immediate ne
 - Considering materialized paths for optimizing location hierarchy queries
 - Modularized backend routing to improve maintainability and optimize for LLM context window minimization
 
+## Active Decisions and Considerations
+
+- Adopted a self-referential location model to allow for arbitrary hierarchical structures
+- Chosen direct SQL over ORM for better performance and control
+- Decided on a progressive implementation approach, starting with core functionality
+- Planning to implement location hierarchy with recursive SQL queries
+- Considering materialized paths for optimizing location hierarchy queries
+- Modularized backend routing to improve maintainability and optimize for LLM context window minimization
+- Standardized on using the latest versions of TanStack Query and TanStack Router for frontend data fetching and routing
+
 ## Important Patterns and Preferences
 
 - Backend using Chi router for RESTful API endpoints
