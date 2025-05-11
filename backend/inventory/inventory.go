@@ -5,7 +5,7 @@ import (
 	"fmt"
 
 	"github.com/google/uuid"
-	"github.com/jackc/pgx"
+	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/m-cain/mnemo/backend/models"
 )
@@ -181,4 +181,50 @@ func (s *InventoryService) GetItemByID(ctx context.Context, id uuid.UUID) (*mode
 	return &item, nil
 }
 
-// TODO: Implement UpdateItem, DeleteItem
+// UpdateItem updates an existing item in the database.
+func (s *InventoryService) UpdateItem(ctx context.Context, id uuid.UUID, item models.Item) (*models.Item, error) {
+	query := `UPDATE items SET name = $1, quantity = $2, unit = $3, location_id = $4, item_type_id = $5, updated_at = CURRENT_TIMESTAMP WHERE id = $6 RETURNING id, name, quantity, unit, location_id, item_type_id, created_at, updated_at`
+
+	var updatedItem models.Item
+	err := s.db.QueryRow(ctx, query,
+		item.Name,
+		item.Quantity,
+		item.Unit,
+		item.LocationID,
+		item.ItemTypeID,
+		id,
+	).Scan(
+		&updatedItem.ID,
+		&updatedItem.Name,
+		&updatedItem.Quantity,
+		&updatedItem.Unit,
+		&updatedItem.LocationID,
+		&updatedItem.ItemTypeID,
+		&updatedItem.CreatedAt,
+		&updatedItem.UpdatedAt,
+	)
+	if err != nil {
+		if err == pgx.ErrNoRows {
+			return nil, nil // Item not found
+		}
+		return nil, fmt.Errorf("failed to update item: %w", err)
+	}
+
+	return &updatedItem, nil
+}
+
+// DeleteItem deletes an item by its ID from the database.
+func (s *InventoryService) DeleteItem(ctx context.Context, id uuid.UUID) error {
+	query := `DELETE FROM items WHERE id = $1`
+
+	result, err := s.db.Exec(ctx, query, id)
+	if err != nil {
+		return fmt.Errorf("failed to delete item: %w", err)
+	}
+
+	if result.RowsAffected() == 0 {
+		return pgx.ErrNoRows // Item not found
+	}
+
+	return nil
+}

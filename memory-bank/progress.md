@@ -33,7 +33,6 @@ This document summarizes the current status of the project, what is working, wha
 
 - Remaining system implementation:
   - Backend core development for authentication and home/user management is largely complete.
-  - Implement remaining core API services for inventory management (Update and Delete for Item).
   - Location hierarchy implementation with recursive queries
 - Frontend PWA development using React, TypeScript, Tailwind CSS, and Shadcn UI
 - Barcode scanning and camera integration
@@ -42,6 +41,7 @@ This document summarizes the current status of the project, what is working, wha
   - Integration with external APIs (e.g., Google Books)
   - Performance optimization and security hardening
   - Documentation and deployment guides
+- Implement PUT quantity route for items.
 
 ## Current Status
 
@@ -50,6 +50,9 @@ This document summarizes the current status of the project, what is working, wha
   - Core database schema migrations completed
   - Core authentication logic implemented
   - Base API structure established
+  - Implemented CRUD operations for ItemType.
+  - Implemented Create, Get by ID, Update, and Delete operations for Item.
+  - Modularized backend routing.
 - Project repository created with the following components:
   - Go 1.24 backend with initial module setup
   - React/TypeScript frontend with Vite

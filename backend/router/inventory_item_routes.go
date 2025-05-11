@@ -7,6 +7,7 @@ import (
 
 	"github.com/go-chi/chi/v5"
 	"github.com/google/uuid"
+	"github.com/jackc/pgx/v5"
 	"github.com/m-cain/mnemo/backend/auth"
 	"github.com/m-cain/mnemo/backend/contextkey"
 	"github.com/m-cain/mnemo/backend/home"
@@ -22,7 +23,10 @@ func RegisterInventoryItemRoutes(r chi.Router, inventoryService *inventory.Inven
 
 		r.Get("/", listItemsHandler(inventoryService))
 		r.Post("/", createItemHandler(inventoryService))
-		// TODO: Add other item routes (GET by ID, PUT, DELETE, PUT quantity)
+		r.Get("/{itemID}", getItemByIDHandler(inventoryService))
+		r.Put("/{itemID}", updateItemHandler(inventoryService))
+		r.Delete("/{itemID}", deleteItemHandler(inventoryService))
+		// TODO: Add PUT quantity route
 	})
 }
 
@@ -88,5 +92,89 @@ func createItemHandler(inventoryService *inventory.InventoryService) http.Handle
 
 		w.WriteHeader(http.StatusCreated)
 		json.NewEncoder(w).Encode(createdItem)
+	}
+}
+
+// getItemByIDHandler returns a http.HandlerFunc that retrieves an item by its ID.
+func getItemByIDHandler(inventoryService *inventory.InventoryService) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		itemIDStr := chi.URLParam(r, "itemID")
+		itemID, err := uuid.Parse(itemIDStr)
+		if err != nil {
+			http.Error(w, "Invalid item ID format", http.StatusBadRequest)
+			return
+		}
+
+		item, err := inventoryService.GetItemByID(r.Context(), itemID)
+		if err != nil {
+			http.Error(w, "Failed to get item", http.StatusInternalServerError)
+			log.Printf("Error getting item by ID: %v", err)
+			return
+		}
+
+		if item == nil {
+			http.Error(w, "Item not found", http.StatusNotFound)
+			return
+		}
+
+		json.NewEncoder(w).Encode(item)
+	}
+}
+
+// updateItemHandler returns a http.HandlerFunc that updates an existing item.
+func updateItemHandler(inventoryService *inventory.InventoryService) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		itemIDStr := chi.URLParam(r, "itemID")
+		itemID, err := uuid.Parse(itemIDStr)
+		if err != nil {
+			http.Error(w, "Invalid item ID format", http.StatusBadRequest)
+			return
+		}
+
+		var req models.Item
+		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+			http.Error(w, "Invalid request body", http.StatusBadRequest)
+			return
+		}
+
+		updatedItem, err := inventoryService.UpdateItem(r.Context(), itemID, req)
+		if err != nil {
+			http.Error(w, "Failed to update item", http.StatusInternalServerError)
+			log.Printf("Error updating item: %v", err)
+			return
+		}
+
+		if updatedItem == nil {
+			http.Error(w, "Item not found", http.StatusNotFound)
+			return
+		}
+
+		json.NewEncoder(w).Encode(updatedItem)
+	}
+}
+
+// deleteItemHandler returns a http.HandlerFunc that deletes an item by its ID.
+func deleteItemHandler(inventoryService *inventory.InventoryService) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		itemIDStr := chi.URLParam(r, "itemID")
+		itemID, err := uuid.Parse(itemIDStr)
+		if err != nil {
+			http.Error(w, "Invalid item ID format", http.StatusBadRequest)
+			return
+		}
+
+		err = inventoryService.DeleteItem(r.Context(), itemID)
+		if err != nil {
+			if err == pgx.ErrNoRows {
+				http.Error(w, "Item not found", http.StatusNotFound)
+				return
+			}
+			http.Error(w, "Failed to delete item", http.StatusInternalServerError)
+			log.Printf("Error deleting item: %v", err)
+			return
+		}
+
+		w.WriteHeader(http.StatusOK)
+		json.NewEncoder(w).Encode(map[string]string{"message": "Item deleted successfully"})
 	}
 }

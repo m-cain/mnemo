@@ -33,14 +33,16 @@ This document tracks the current focus of work, recent changes, and immediate ne
 - Integrated new inventory handlers and routes into `backend/main.go`.
 - Modularized backend routing by moving all route definitions and handlers from `backend/main.go` to a new `backend/router` package with separate files per route group.
 - Refactored `backend/main.go` to be minimal, focusing on setup and server start using the new router.
+- Implemented `UpdateItem` and `DeleteItem` functions in `backend/inventory/inventory.go`.
+- Added handlers and registered routes for updating and deleting items in `backend/router/inventory_item_routes.go`.
+- Corrected `pgx` import path in `backend/inventory/inventory.go` and `backend/router/inventory_item_routes.go`.
 
 ## Next Steps
 
-- Backend core development for authentication and home/user management is largely complete.
-- Implement core API services for inventory management.
-- Implement location hierarchy logic.
+- Implement location hierarchy logic in the backend.
 - Begin developing frontend components using React, TypeScript, Tailwind CSS, and Shadcn UI.
 - Investigate backend `.golangci.yml` schema validation issue.
+- Implement PUT quantity route for items.
 
 ## Active Decisions and Considerations
 
