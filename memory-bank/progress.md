@@ -33,7 +33,6 @@ This document summarizes the current status of the project, what is working, wha
 
 - Remaining system implementation:
   - Backend core development for authentication and home/user management is largely complete.
-  - Location hierarchy implementation with recursive queries
 - Frontend PWA development using React, TypeScript, Tailwind CSS, and Shadcn UI
 - Barcode scanning and camera integration
 - Search functionality with NLP capabilities
@@ -61,6 +60,7 @@ This document summarizes the current status of the project, what is working, wha
   - Implemented Create, Get by ID, Update, and Delete operations for Item.
   - Modularized backend routing.
   - Defined and implemented a standard for "Not Found" errors using `apperrors.ErrNotFound`.
+  - Implemented backend location hierarchy logic (CRUD and listing).
 - Project repository created with the following components:
   - Go 1.24 backend with initial module setup
   - React/TypeScript frontend with Vite
@@ -70,7 +70,6 @@ This document summarizes the current status of the project, what is working, wha
 
 ## Known Issues
 
-- Schema validation issue with the `.golangci.yml` file in the backend linter configuration. This issue persists and requires further investigation.
 - Persistent compiler error (`undefined: homeID`) in the `listItemsHandler` function in `backend/main.go` despite correct parsing and top-level import. This issue needs further investigation if it persists during build/testing.
 - Potential challenges identified:
   - Performance optimization for recursive location queries

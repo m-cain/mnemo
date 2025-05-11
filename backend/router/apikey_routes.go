@@ -9,10 +9,11 @@ import (
 	"github.com/jackc/pgx/v5"
 	"github.com/m-cain/mnemo/backend/auth"
 	"github.com/m-cain/mnemo/backend/contextkey"
+	"github.com/m-cain/mnemo/backend/inventory"
 )
 
 // RegisterAPIKeyRoutes registers the API key related routes.
-func RegisterAPIKeyRoutes(r chi.Router, apiKeyService *auth.APIKeyService, authService *auth.AuthService) {
+func RegisterAPIKeyRoutes(r chi.Router, apiKeyService *auth.APIKeyService, authService *auth.AuthService, inventoryService *inventory.InventoryService) {
 	r.Route("/api-keys", func(r chi.Router) {
 		r.Use(authService.AuthMiddleware) // Protect API key routes
 

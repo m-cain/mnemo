@@ -40,10 +40,14 @@ func NewRouter(dbPool *pgxpool.Pool, apiKeyService *auth.APIKeyService, authServ
 		authService.RegisterRoutes(r)
 
 		// Register other route groups
-		RegisterAPIKeyRoutes(r, apiKeyService, authService)
+		RegisterAPIKeyRoutes(r, apiKeyService, authService, inventoryService) // Added inventoryService
 		RegisterInventoryItemRoutes(r, inventoryService, authService, homeService)
 		RegisterInventoryItemTypeRoutes(r, inventoryService, authService)
-		RegisterHomeRoutes(r, homeService, authService)
+		RegisterHomeRoutes(r, homeService, authService, inventoryService) // Added inventoryService
+
+		// Register location routes
+		locationRouter := NewLocationRouter(inventoryService)
+		r.Route("/locations", locationRouter.RegisterRoutes)
 	})
 
 	return r

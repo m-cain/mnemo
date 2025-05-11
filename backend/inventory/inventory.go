@@ -136,6 +136,141 @@ func (s *InventoryService) DeleteItemType(ctx context.Context, id uuid.UUID) err
 	return nil
 }
 
+// ListLocationsByHome retrieves all top-level locations for a given home.
+func (s *InventoryService) ListLocationsByHome(ctx context.Context, homeID uuid.UUID) ([]models.Location, error) {
+	query := `SELECT id, name, parent_location_id, home_id, created_at, updated_at FROM locations WHERE home_id = $1 AND parent_location_id IS NULL`
+
+	rows, err := s.db.Query(ctx, query, homeID)
+	if err != nil {
+		return nil, fmt.Errorf("failed to query top-level locations: %w", err)
+	}
+	defer rows.Close()
+
+	var locations []models.Location
+	for rows.Next() {
+		var location models.Location
+		if err := rows.Scan(&location.ID, &location.Name, &location.ParentLocationID, &location.HomeID, &location.CreatedAt, &location.UpdatedAt); err != nil {
+			return nil, fmt.Errorf("failed to scan location row: %w", err)
+		}
+		locations = append(locations, location)
+	}
+
+	if err := rows.Err(); err != nil {
+		return nil, fmt.Errorf("error after scanning location rows: %w", err)
+	}
+
+	return locations, nil
+}
+
+// ListLocationsByParent retrieves direct child locations for a given parent location.
+func (s *InventoryService) ListLocationsByParent(ctx context.Context, parentLocationID uuid.UUID) ([]models.Location, error) {
+	query := `SELECT id, name, parent_location_id, home_id, created_at, updated_at FROM locations WHERE parent_location_id = $1`
+
+	rows, err := s.db.Query(ctx, query, parentLocationID)
+	if err != nil {
+		return nil, fmt.Errorf("failed to query child locations: %w", err)
+	}
+	defer rows.Close()
+
+	var locations []models.Location
+	for rows.Next() {
+		var location models.Location
+		if err := rows.Scan(&location.ID, &location.Name, &location.ParentLocationID, &location.HomeID, &location.CreatedAt, &location.UpdatedAt); err != nil {
+			return nil, fmt.Errorf("failed to scan location row: %w", err)
+		}
+		locations = append(locations, location)
+	}
+
+	if err := rows.Err(); err != nil {
+		return nil, fmt.Errorf("error after scanning location rows: %w", err)
+	}
+
+	return locations, nil
+}
+
+// CreateLocation creates a new location in the database.
+func (s *InventoryService) CreateLocation(ctx context.Context, name string, parentLocationID *uuid.UUID, homeID uuid.UUID) (*models.Location, error) {
+	query := `INSERT INTO locations (name, parent_location_id, home_id) VALUES ($1, $2, $3) RETURNING id, name, parent_location_id, home_id, created_at, updated_at`
+
+	var location models.Location
+	err := s.db.QueryRow(ctx, query, name, parentLocationID, homeID).Scan(&location.ID, &location.Name, &location.ParentLocationID, &location.HomeID, &location.CreatedAt, &location.UpdatedAt)
+	if err != nil {
+		return nil, fmt.Errorf("failed to insert location: %w", err)
+	}
+
+	return &location, nil
+}
+
+// DeleteLocation deletes a location by its ID from the database.
+// It will return an error if the location has child locations.
+func (s *InventoryService) DeleteLocation(ctx context.Context, id uuid.UUID) error {
+	// Check if the location has any child locations
+	countQuery := `SELECT COUNT(*) FROM locations WHERE parent_location_id = $1`
+	var count int
+	err := s.db.QueryRow(ctx, countQuery, id).Scan(&count)
+	if err != nil {
+		return fmt.Errorf("failed to check for child locations: %w", err)
+	}
+	if count > 0 {
+		return fmt.Errorf("location has child locations and cannot be deleted")
+	}
+
+	// Check if the location has any items
+	itemCountQuery := `SELECT COUNT(*) FROM items WHERE location_id = $1`
+	var itemCount int
+	err = s.db.QueryRow(ctx, itemCountQuery, id).Scan(&itemCount)
+	if err != nil {
+		return fmt.Errorf("failed to check for items in location: %w", err)
+	}
+	if itemCount > 0 {
+		return fmt.Errorf("location contains items and cannot be deleted")
+	}
+
+	query := `DELETE FROM locations WHERE id = $1`
+	result, err := s.db.Exec(ctx, query, id)
+	if err != nil {
+		return fmt.Errorf("failed to delete location: %w", err)
+	}
+
+	if result.RowsAffected() == 0 {
+		return pgx.ErrNoRows // Location not found
+	}
+
+	return nil
+}
+
+// UpdateLocation updates an existing location in the database.
+func (s *InventoryService) UpdateLocation(ctx context.Context, id uuid.UUID, name string, parentLocationID *uuid.UUID) (*models.Location, error) {
+	query := `UPDATE locations SET name = $1, parent_location_id = $2, updated_at = CURRENT_TIMESTAMP WHERE id = $3 RETURNING id, name, parent_location_id, home_id, created_at, updated_at`
+
+	var location models.Location
+	err := s.db.QueryRow(ctx, query, name, parentLocationID, id).Scan(&location.ID, &location.Name, &location.ParentLocationID, &location.HomeID, &location.CreatedAt, &location.UpdatedAt)
+	if err != nil {
+		if err == pgx.ErrNoRows {
+			return nil, apperrors.ErrNotFound // Location not found
+		}
+		return nil, fmt.Errorf("failed to update location: %w", err)
+	}
+
+	return &location, nil
+}
+
+// GetLocationByID retrieves a location by its ID from the database.
+func (s *InventoryService) GetLocationByID(ctx context.Context, id uuid.UUID) (*models.Location, error) {
+	query := `SELECT id, name, parent_location_id, home_id, created_at, updated_at FROM locations WHERE id = $1`
+
+	var location models.Location
+	err := s.db.QueryRow(ctx, query, id).Scan(&location.ID, &location.Name, &location.ParentLocationID, &location.HomeID, &location.CreatedAt, &location.UpdatedAt)
+	if err != nil {
+		if err == pgx.ErrNoRows {
+			return nil, apperrors.ErrNotFound // Location not found
+		}
+		return nil, fmt.Errorf("failed to query location by ID: %w", err)
+	}
+
+	return &location, nil
+}
+
 // UpdateItemQuantity updates the quantity of an existing item in the database.
 func (s *InventoryService) UpdateItemQuantity(ctx context.Context, id uuid.UUID, quantity int) error {
 	query := `UPDATE items SET quantity = $1, updated_at = CURRENT_TIMESTAMP WHERE id = $2`

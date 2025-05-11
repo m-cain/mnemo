@@ -11,10 +11,11 @@ import (
 	"github.com/m-cain/mnemo/backend/auth"
 	"github.com/m-cain/mnemo/backend/contextkey"
 	"github.com/m-cain/mnemo/backend/home"
+	"github.com/m-cain/mnemo/backend/inventory"
 )
 
 // RegisterHomeRoutes registers the home related routes.
-func RegisterHomeRoutes(r chi.Router, homeService *home.HomeService, authService *auth.AuthService) {
+func RegisterHomeRoutes(r chi.Router, homeService *home.HomeService, authService *auth.AuthService, inventoryService *inventory.InventoryService) {
 	r.Route("/homes", func(r chi.Router) {
 		r.Use(authService.AuthMiddleware) // Protect home routes
 
