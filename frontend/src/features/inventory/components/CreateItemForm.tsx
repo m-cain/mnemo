@@ -1,3 +1,4 @@
+import { zodResolver } from "@hookform/resolvers/zod";
 import { Link, useNavigate } from "@tanstack/react-router";
 import {
   ArrowLeft,
@@ -7,6 +8,7 @@ import {
   PlusCircle,
 } from "lucide-react";
 import { useEffect, useState } from "react";
+import { useForm, type SubmitHandler } from "react-hook-form";
 import { Button } from "../../../components/ui/button";
 import {
   Card,
@@ -28,32 +30,37 @@ import {
 import { Textarea } from "../../../components/ui/textarea";
 import { useCreateItemMutation } from "../hooks/useCreateItemMutation";
 import { useItemTypesQuery } from "../hooks/useItemTypesQuery";
+import type { ItemFormValues } from "../schemas/itemValidationSchema";
+import { itemSchema } from "../schemas/itemValidationSchema";
 
 /**
  * Form to create a new inventory item
  */
 export default function CreateItemForm() {
   // TODO: This should be retrieved from context or user selection
-  const [selectedHomeId, setSelectedHomeId] = useState<string | null>(null);
   const navigate = useNavigate();
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [selectedHomeId, setSelectedHomeId] = useState<string | null>(null);
 
-  // Form state
-  const [formData, setFormData] = useState({
-    name: "",
-    description: "",
-    type_id: "",
-    location_id: "",
-    barcode: "",
-    quantity: 1,
-    quantity_unit: "",
+  // Set up react-hook-form with Zod validation
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+    setValue,
+    watch,
+  } = useForm<ItemFormValues>({
+    resolver: zodResolver(itemSchema) as any,
+    defaultValues: {
+      name: "",
+      description: "",
+      type_id: "",
+      location_id: "",
+      barcode: "",
+      quantity: 1,
+      quantity_unit: "",
+      home_id: "",
+    },
   });
-
-  // Validation state - track touched fields to show errors only after interaction
-  const [errors, setErrors] = useState<Record<string, string>>({});
-  const [touchedFields, setTouchedFields] = useState<Record<string, boolean>>(
-    {}
-  );
 
   // Item creation mutation
   const createMutation = useCreateItemMutation(selectedHomeId || "");
@@ -62,152 +69,34 @@ export default function CreateItemForm() {
   const { data: itemTypesResponse, isLoading: itemTypesLoading } =
     useItemTypesQuery(selectedHomeId || "");
 
-  // Handle form field changes - for regular Input components
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) => {
-    const { name, value } = e.target;
-
-    // Mark field as touched
-    setTouchedFields({
-      ...touchedFields,
-      [name]: true,
+  // Custom handler for Select component changes
+  const handleSelectChange = (name: keyof ItemFormValues, value: string) => {
+    setValue(name, value, {
+      shouldValidate: true,
+      shouldDirty: true,
+      shouldTouch: true,
     });
-
-    // Convert quantity to number if it's the quantity field
-    if (name === "quantity") {
-      setFormData({
-        ...formData,
-        [name]: value === "" ? 0 : parseFloat(value),
-      });
-    } else {
-      setFormData({
-        ...formData,
-        [name]: value,
-      });
-    }
-
-    // Validate field on change
-    validateField(
-      name,
-      name === "quantity" ? (value === "" ? 0 : parseFloat(value)) : value
-    );
-  };
-
-  // Handle select changes - for Shadcn Select component
-  const handleSelectChange = (name: string, value: string) => {
-    setTouchedFields({
-      ...touchedFields,
-      [name]: true,
-    });
-
-    setFormData({
-      ...formData,
-      [name]: value,
-    });
-
-    // Validate field on change
-    validateField(name, value);
-  };
-
-  // Validate a single field
-  const validateField = (name: string, value: string | number) => {
-    const newErrors = { ...errors };
-
-    switch (name) {
-      case "name":
-        if (typeof value === "string" && !value.trim()) {
-          newErrors.name = "Name is required";
-        } else {
-          delete newErrors.name;
-        }
-        break;
-
-      case "type_id":
-        if (value === "") {
-          newErrors.type_id = "Item type is required";
-        } else {
-          delete newErrors.type_id;
-        }
-        break;
-
-      case "quantity":
-        if (typeof value === "number" && value < 0) {
-          newErrors.quantity = "Quantity cannot be negative";
-        } else {
-          delete newErrors.quantity;
-        }
-        break;
-
-      default:
-        break;
-    }
-
-    setErrors(newErrors);
-  };
-
-  // Validate the entire form
-  const validateForm = () => {
-    const newErrors: Record<string, string> = {};
-
-    if (!formData.name.trim()) {
-      newErrors.name = "Name is required";
-    }
-
-    if (!formData.type_id) {
-      newErrors.type_id = "Item type is required";
-    }
-
-    if (formData.quantity < 0) {
-      newErrors.quantity = "Quantity cannot be negative";
-    }
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
   };
 
   // Handle form submission
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-
-    // Mark all fields as touched to show all validation errors
-    const allFields = [
-      "name",
-      "description",
-      "type_id",
-      "barcode",
-      "quantity",
-      "quantity_unit",
-      "location_id",
-    ];
-    const allTouched = allFields.reduce((acc, field) => {
-      acc[field] = true;
-      return acc;
-    }, {} as Record<string, boolean>);
-
-    setTouchedFields(allTouched);
-
+  const onSubmit: SubmitHandler<ItemFormValues> = async (data) => {
     if (!selectedHomeId) {
-      setErrors({ homeId: "Please select a home" });
       return;
     }
-
-    if (!validateForm()) {
-      return;
-    }
-
-    setIsSubmitting(true);
 
     try {
       await createMutation.mutateAsync({
-        ...formData,
+        ...data,
+        // Convert undefined to null for backend compatibility
+        description: data.description || null,
+        barcode: data.barcode || null,
+        quantity_unit: data.quantity_unit || null,
+        location_id: data.location_id || null,
         home_id: selectedHomeId,
       });
       navigate({ to: "/inventory" });
     } catch (error) {
       console.error("Failed to create item:", error);
-      setErrors({ submit: "Failed to create item. Please try again." });
-      setIsSubmitting(false);
     }
   };
 
@@ -216,9 +105,11 @@ export default function CreateItemForm() {
     if (!selectedHomeId) {
       // This is just for demo purposes
       // In a real app, this would be set via context or user selection
-      setSelectedHomeId("sample-home-id");
+      const sampleHomeId = "sample-home-id";
+      setSelectedHomeId(sampleHomeId);
+      setValue("home_id", sampleHomeId);
     }
-  }, [selectedHomeId]);
+  }, [selectedHomeId, setValue]);
 
   // Render no home selected state
   if (!selectedHomeId) {
@@ -264,7 +155,7 @@ export default function CreateItemForm() {
           <CardContent>
             <form
               id="create-item-form"
-              onSubmit={handleSubmit}
+              onSubmit={handleSubmit(onSubmit)}
               className="space-y-6"
             >
               {/* Basic Information Section */}
@@ -278,16 +169,14 @@ export default function CreateItemForm() {
                   </Label>
                   <Input
                     id="name"
-                    name="name"
-                    value={formData.name}
-                    onChange={handleChange}
                     placeholder="Enter item name"
-                    className={
-                      errors.name && touchedFields.name ? "border-red-500" : ""
-                    }
+                    {...register("name")}
+                    className={errors.name ? "border-red-500" : ""}
                   />
-                  {errors.name && touchedFields.name && (
-                    <p className="text-sm text-red-600">{errors.name}</p>
+                  {errors.name && (
+                    <p className="text-sm text-red-600">
+                      {errors.name.message}
+                    </p>
                   )}
                 </div>
 
@@ -296,11 +185,9 @@ export default function CreateItemForm() {
                   <Label htmlFor="description">Description</Label>
                   <Textarea
                     id="description"
-                    name="description"
-                    value={formData.description}
-                    onChange={handleChange}
                     placeholder="Optional description of the item"
                     rows={3}
+                    {...register("description")}
                   />
                 </div>
 
@@ -310,18 +197,14 @@ export default function CreateItemForm() {
                     Item Type <span className="text-red-500 ml-1">*</span>
                   </Label>
                   <Select
-                    value={formData.type_id}
+                    value={watch("type_id")}
                     onValueChange={(value) =>
                       handleSelectChange("type_id", value)
                     }
                   >
                     <SelectTrigger
                       id="type_id"
-                      className={
-                        errors.type_id && touchedFields.type_id
-                          ? "border-red-500"
-                          : ""
-                      }
+                      className={errors.type_id ? "border-red-500" : ""}
                     >
                       <SelectValue placeholder="Select Item Type" />
                     </SelectTrigger>
@@ -339,8 +222,10 @@ export default function CreateItemForm() {
                       )}
                     </SelectContent>
                   </Select>
-                  {errors.type_id && touchedFields.type_id && (
-                    <p className="text-sm text-red-600">{errors.type_id}</p>
+                  {errors.type_id && (
+                    <p className="text-sm text-red-600">
+                      {errors.type_id.message}
+                    </p>
                   )}
                 </div>
 
@@ -349,10 +234,8 @@ export default function CreateItemForm() {
                   <Label htmlFor="barcode">Barcode</Label>
                   <Input
                     id="barcode"
-                    name="barcode"
-                    value={formData.barcode}
-                    onChange={handleChange}
                     placeholder="Optional barcode"
+                    {...register("barcode")}
                   />
                 </div>
               </div>
@@ -368,29 +251,23 @@ export default function CreateItemForm() {
                     <Input
                       type="number"
                       id="quantity"
-                      name="quantity"
-                      value={formData.quantity.toString()}
-                      onChange={handleChange}
                       min="0"
                       step="0.01"
-                      className={
-                        errors.quantity && touchedFields.quantity
-                          ? "border-red-500"
-                          : ""
-                      }
+                      {...register("quantity", { valueAsNumber: true })}
+                      className={errors.quantity ? "border-red-500" : ""}
                     />
-                    {errors.quantity && touchedFields.quantity && (
-                      <p className="text-sm text-red-600">{errors.quantity}</p>
+                    {errors.quantity && (
+                      <p className="text-sm text-red-600">
+                        {errors.quantity.message}
+                      </p>
                     )}
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="quantity_unit">Unit (optional)</Label>
                     <Input
                       id="quantity_unit"
-                      name="quantity_unit"
-                      value={formData.quantity_unit}
-                      onChange={handleChange}
                       placeholder="e.g., kg, pcs, etc."
+                      {...register("quantity_unit")}
                     />
                   </div>
                 </div>
@@ -399,7 +276,7 @@ export default function CreateItemForm() {
                 <div className="space-y-2">
                   <Label htmlFor="location_id">Location</Label>
                   <Select
-                    value={formData.location_id}
+                    value={watch("location_id") || ""}
                     onValueChange={(value) =>
                       handleSelectChange("location_id", value)
                     }
@@ -421,9 +298,9 @@ export default function CreateItemForm() {
               </div>
 
               {/* Form error */}
-              {errors.submit && (
+              {createMutation.isError && (
                 <div className="p-3 bg-red-50 border border-red-200 text-red-800 rounded-md">
-                  {errors.submit}
+                  Failed to create item. Please try again.
                 </div>
               )}
             </form>

@@ -3,13 +3,10 @@ import {
   AlertTriangle,
   ArrowLeft,
   MapPin,
-  MinusCircle,
   Package,
   Pencil,
-  PlusCircle,
   Trash,
 } from "lucide-react";
-import { useState } from "react";
 import { Badge } from "../../../components/ui/badge";
 import { Button } from "../../../components/ui/button";
 import {
@@ -20,17 +17,11 @@ import {
   CardHeader,
   CardTitle,
 } from "../../../components/ui/card";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "../../../components/ui/dialog";
 import { useDeleteItemMutation } from "../hooks/useDeleteItemMutation";
 import { useItemQuery } from "../hooks/useItemQuery";
 import { useUpdateItemQuantityMutation } from "../hooks/useUpdateItemQuantityMutation";
+import type { QuantityAdjustmentFormValues } from "../schemas/itemValidationSchema";
+import { QuantityAdjustmentDialog } from "./QuantityAdjustmentDialog.zod";
 
 /**
  * Page to display details of a single inventory item
@@ -38,9 +29,6 @@ import { useUpdateItemQuantityMutation } from "../hooks/useUpdateItemQuantityMut
 export default function ItemDetailPage() {
   const { itemId } = useParams({ from: "/inventory/$itemId" });
   const navigate = useNavigate();
-  const [isAdjustQuantityDialogOpen, setIsAdjustQuantityDialogOpen] =
-    useState(false);
-  const [quantityAdjustment, setQuantityAdjustment] = useState(1);
 
   // Fetch the item details
   const {
@@ -65,10 +53,11 @@ export default function ItemDetailPage() {
     }
   };
 
-  // Handle quantity adjustment
-  const handleQuantityAdjustment = async (newQuantity: number) => {
-    await quantityMutation.mutateAsync(newQuantity);
-    setIsAdjustQuantityDialogOpen(false);
+  // Handle quantity adjustment from the dialog
+  const handleQuantityAdjustment = async (
+    data: QuantityAdjustmentFormValues
+  ) => {
+    await quantityMutation.mutateAsync(data.newQuantity);
   };
 
   // Render loading state
@@ -248,29 +237,11 @@ export default function ItemDetailPage() {
                     </Badge>
                   )}
                 </div>
-                <div className="mt-4 flex items-center space-x-2">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => {
-                      setQuantityAdjustment(-1);
-                      setIsAdjustQuantityDialogOpen(true);
-                    }}
-                  >
-                    <MinusCircle className="mr-1 h-4 w-4" />
-                    Decrease
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => {
-                      setQuantityAdjustment(1);
-                      setIsAdjustQuantityDialogOpen(true);
-                    }}
-                  >
-                    <PlusCircle className="mr-1 h-4 w-4" />
-                    Increase
-                  </Button>
+                <div className="mt-4">
+                  <QuantityAdjustmentDialog
+                    currentQuantity={item.quantity}
+                    onAdjust={handleQuantityAdjustment}
+                  />
                 </div>
               </div>
               <div>
@@ -293,77 +264,6 @@ export default function ItemDetailPage() {
           </CardFooter>
         </Card>
       </div>
-
-      {/* Quantity Adjustment Dialog */}
-      <Dialog
-        open={isAdjustQuantityDialogOpen}
-        onOpenChange={setIsAdjustQuantityDialogOpen}
-      >
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Adjust Quantity</DialogTitle>
-            <DialogDescription>
-              {quantityAdjustment > 0 ? "Increase" : "Decrease"} the quantity of{" "}
-              {item.name}.
-            </DialogDescription>
-          </DialogHeader>
-          <div className="py-4">
-            <div className="flex items-center justify-center space-x-4">
-              <Button
-                variant="outline"
-                onClick={() => {
-                  const newAdjustment =
-                    quantityAdjustment > 0
-                      ? Math.max(1, quantityAdjustment - 1)
-                      : Math.min(-1, quantityAdjustment + 1);
-                  setQuantityAdjustment(newAdjustment);
-                }}
-              >
-                -
-              </Button>
-              <div className="text-center font-medium text-2xl w-16">
-                {Math.abs(quantityAdjustment)}
-              </div>
-              <Button
-                variant="outline"
-                onClick={() => {
-                  const newAdjustment =
-                    quantityAdjustment > 0
-                      ? quantityAdjustment + 1
-                      : quantityAdjustment - 1;
-                  setQuantityAdjustment(newAdjustment);
-                }}
-              >
-                +
-              </Button>
-            </div>
-            <p className="text-center mt-4">
-              New quantity will be:{" "}
-              <strong>{item.quantity + quantityAdjustment}</strong>
-              {item.quantity_unit && <span> {item.quantity_unit}</span>}
-            </p>
-          </div>
-          <DialogFooter>
-            <Button
-              variant="outline"
-              onClick={() => setIsAdjustQuantityDialogOpen(false)}
-            >
-              Cancel
-            </Button>
-            <Button
-              onClick={() =>
-                handleQuantityAdjustment(item.quantity + quantityAdjustment)
-              }
-              disabled={
-                quantityAdjustment === 0 ||
-                item.quantity + quantityAdjustment < 0
-              }
-            >
-              Confirm
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
     </div>
   );
 }

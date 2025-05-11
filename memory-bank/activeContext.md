@@ -6,6 +6,18 @@ We are developing an inventory management system with a React frontend and a Go 
 
 ## Recent Changes
 
+- Implemented form validation with Zod and react-hook-form:
+
+  - Created validation schemas for item forms and quantity adjustments
+  - Integrated react-hook-form for better form state management
+  - Replaced manual validation with schema-based validation
+  - Improved type safety with proper TypeScript integration
+  - Enhanced user feedback with field-level error messages
+  - Created a new QuantityAdjustmentDialog.zod.tsx component using the new validation pattern
+  - Integrated shadcn/ui form components for consistent UI and better validation
+  - Added proper FormField components with modern rendering pattern
+  - Utilized the 21st-dev Magic MCP server for advanced UI component generation
+
 - Added sorting capabilities to the inventory table on ItemListPage:
   - Implemented column header sorting with visual indicators
   - Support for sorting by name, item type, location, and quantity
@@ -45,7 +57,7 @@ The inventory management UI now includes:
    - Two-column card layout (3-column on larger screens)
    - Item details card with organized information sections
    - Quantity and location card with adjustment controls
-   - Confirm dialog for quantity adjustments
+   - Confirm dialog for quantity adjustments with improved validation
    - Consistent error and empty states
 
 3. CreateItemForm:
@@ -57,18 +69,22 @@ The inventory management UI now includes:
 
 ## Next Steps
 
-1. Create dashboard visualizations (charts, graphs) for inventory analytics
-2. Implement bulk operations (import/export, multi-select delete/edit)
-3. Improve the home selection UI (currently using a placeholder)
-4. Add more comprehensive input validation
-5. Add pagination for inventory tables with large datasets
+1. Extend form validation to remaining forms (login, registration)
+2. Create dashboard visualizations (charts, graphs) for inventory analytics
+3. Implement bulk operations (import/export, multi-select delete/edit)
+4. Improve the home selection UI (currently using a placeholder)
+5. Add more comprehensive input validation
+6. Add pagination for inventory tables with large datasets
 
 ## Technical Decisions
 
+- Using Zod for form validation to ensure type safety and consistent validation
+- Using react-hook-form for form state management and validation integration
 - Using shadcn/ui for component library to ensure consistent styling and functionality
 - Using relative imports (../../../) instead of alias imports (@/) to avoid path resolution issues
 - Implementing type-safe React event handlers
-- Utilized the magic UI component generator for inspiration on advanced UI patterns
+- Utilized the 21st-dev Magic MCP server for generating sophisticated UI components
+- Using FormField rendering pattern with render props for better component isolation
 
 ## User Experience Focus
 
@@ -76,3 +92,5 @@ The inventory management UI now includes:
 - Simplifying search, filtering, and sorting operations
 - Ensuring responsive design works across device sizes
 - Using clear visual indicators for item status (low stock, sorting direction)
+- Providing contextual error messages with field-level validation
+- Using consistent UI patterns for forms and interactive elements

@@ -14,6 +14,17 @@
 
 ## Recently Completed
 
+- **Implemented Form Validation with Zod**:
+
+  - Added Zod validation schemas for item forms and quantity adjustments
+  - Integrated react-hook-form for better form state management
+  - Enhanced type safety with proper TypeScript integration
+  - Improved form error handling and user feedback
+  - Created reusable validation schemas for consistent validation
+  - Integrated shadcn/ui Form components for modern form handling
+  - Added new FormField component with render prop pattern for better component isolation
+  - Used 21st-dev Magic MCP server to generate advanced UI components for forms
+
 - **Implemented Inventory Table Sorting**:
   - Added sortable columns with visual indicators for sort direction
   - Implemented client-side sorting for name, type, location, and quantity
@@ -41,9 +52,12 @@
   - Created missing Shadcn UI components (Input, Textarea) for consistent styling
   - Integrated shadcn/ui for consistent and professional UI components
   - Used the 21st-dev Magic MCP server for generating sophisticated UI components
+  - Refactored the quantity adjustment dialog with modern form patterns
+  - Implemented improved form validation error handling with proper field-level error messaging
 
 ## Current Development Focus
 
+- Enhancing form validation across the application
 - Creating visualizations for inventory analytics
 - Implementing bulk operations (import/export, batch editing)
 - Improving home selection UI
@@ -52,7 +66,7 @@
 ## Known Issues
 
 - No home selection UI implemented (currently using a placeholder)
-- Missing validation in item forms
+- Incomplete validation in some forms
 - UI is not fully responsive on all screen sizes
 - No error recovery strategy for failed API calls
 
