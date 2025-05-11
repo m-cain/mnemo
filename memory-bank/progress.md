@@ -17,6 +17,7 @@ This document summarizes the current status of the project, what is working, wha
   - CI/CD pipeline established with GitHub Actions
   - Development documentation created
 - Database schema migrations for `users`, `homes`, `home_users`, and `locations` tables are created and populated.
+- Database schema migrations for `item_types`, `items`, and `api_keys` tables are created and populated.
 - Core authentication logic (user registration and login with JWT) is implemented.
 - Base backend API structure is set up with Chi router and registered authentication routes.
 - Go module name is correctly configured as "github.com/m-cain/mnemo" at the project root.
@@ -24,7 +25,7 @@ This document summarizes the current status of the project, what is working, wha
 ## What's Left to Build
 
 - Remaining system implementation:
-  - Database schema implementation and migrations (remaining tables: `items`, `item_types`, `api_keys`)
+  - Database schema implementation and migrations are complete.
   - Authentication system (API keys, user management, etc.)
   - Core API services for inventory management
   - Location hierarchy implementation with recursive queries

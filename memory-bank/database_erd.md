@@ -8,7 +8,7 @@ erDiagram
     LOCATION ||--o{ LOCATION : "contains"
     LOCATION ||--o{ ITEM : "contains"
     ITEM }|--|| ITEM_TYPE : "is of"
-    HOME ||--o{ API_KEY : "has"
+    USER ||--o{ API_KEY : "has"
 
     USER {
         uuid id PK
@@ -48,11 +48,9 @@ erDiagram
         uuid id PK
         uuid location_id FK
         string name
-        string barcode
-        uuid type_id FK
-        float quantity
-        string unit
-        json attributes
+        uuid item_type_id FK
+        integer quantity
+        varchar(50) unit
         timestamp created_at
         timestamp updated_at
     }
@@ -60,19 +58,17 @@ erDiagram
     ITEM_TYPE {
         uuid id PK
         string name
-        json metadata
-        json default_attributes
         timestamp created_at
         timestamp updated_at
     }
 
     API_KEY {
         uuid id PK
-        uuid home_id FK
+        uuid user_id FK
         string name
-        string key_hash
-        json permissions
+        string key
+        boolean is_active
         timestamp created_at
-        timestamp expires_at
+        timestamp updated_at
     }
 ```

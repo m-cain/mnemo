@@ -215,8 +215,8 @@ CREATE TABLE users (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     email VARCHAR(255) NOT NULL UNIQUE,
     password_hash VARCHAR(255) NOT NULL,
-    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 
 -- Homes table
@@ -224,8 +224,8 @@ CREATE TABLE homes (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     name VARCHAR(255) NOT NULL,
     owner_id UUID NOT NULL REFERENCES users(id),
-    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 
 -- Home users table
@@ -233,7 +233,7 @@ CREATE TABLE home_users (
     home_id UUID REFERENCES homes(id),
     user_id UUID REFERENCES users(id),
     role VARCHAR(50) NOT NULL,
-    joined_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    joined_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (home_id, user_id)
 );
 
@@ -241,57 +241,52 @@ CREATE TABLE home_users (
 CREATE TABLE locations (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     home_id UUID NOT NULL REFERENCES homes(id),
-    parent_location_id UUID REFERENCES locations(id),
+    parent_location_id UUID REFERENCES locations(id) ON DELETE SET NULL,
     name VARCHAR(255) NOT NULL,
     type VARCHAR(100) NOT NULL,
     metadata JSONB DEFAULT '{}',
-    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 
 -- Item types table
 CREATE TABLE item_types (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    name VARCHAR(255) NOT NULL,
-    metadata JSONB DEFAULT '{}',
-    default_attributes JSONB DEFAULT '{}',
-    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+    name VARCHAR(255) NOT NULL UNIQUE,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 
 -- Items table
 CREATE TABLE items (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    location_id UUID REFERENCES locations(id),
     name VARCHAR(255) NOT NULL,
-    barcode VARCHAR(255),
-    type_id UUID REFERENCES item_types(id),
-    quantity FLOAT NOT NULL DEFAULT 1,
+    quantity INTEGER NOT NULL DEFAULT 0,
     unit VARCHAR(50),
-    attributes JSONB DEFAULT '{}',
-    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+    location_id UUID REFERENCES locations(id) ON DELETE SET NULL,
+    item_type_id UUID REFERENCES item_types(id) ON DELETE SET NULL,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 
 -- API keys table
 CREATE TABLE api_keys (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    home_id UUID NOT NULL REFERENCES homes(id),
-    name VARCHAR(255) NOT NULL,
-    key_hash VARCHAR(255) NOT NULL,
-    permissions JSONB NOT NULL DEFAULT '{}',
-    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-    expires_at TIMESTAMP WITH TIME ZONE
+    key VARCHAR(255) NOT NULL UNIQUE,
+    name VARCHAR(255),
+    user_id UUID REFERENCES users(id) ON DELETE CASCADE,
+    is_active BOOLEAN NOT NULL DEFAULT TRUE,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 
 -- Indexes
 CREATE INDEX ON locations(home_id);
 CREATE INDEX ON locations(parent_location_id);
 CREATE INDEX ON items(location_id);
-CREATE INDEX ON items(type_id);
-CREATE INDEX ON items(barcode);
+CREATE INDEX ON items(item_type_id);
+CREATE INDEX idx_api_keys_key ON api_keys(key);
 CREATE INDEX ON home_users(user_id);
-CREATE INDEX ON api_keys(home_id);
 ```
 
 ### API Endpoints Structure
