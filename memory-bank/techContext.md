@@ -11,6 +11,7 @@ This document outlines the technologies used, the development setup, technical c
 - **Migration Tool:** golang-migrate
 - **Frontend:** React with TypeScript
 - **UI Components:** Shadcn
+- **Styling:** Tailwind CSS
 - **Frontend Deployment:** Progressive Web App (PWA)
 
 ## Development Setup
@@ -65,6 +66,7 @@ This document outlines the technologies used, the development setup, technical c
 
   - React: core frontend library
   - TypeScript: type safety and improved developer experience
+  - Tailwind CSS: utility-first CSS framework
   - Shadcn: UI component library
 
 - **External APIs:**

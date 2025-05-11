@@ -11,7 +11,7 @@ This document summarizes the current status of the project, what is working, wha
 - Project initialization and environment setup (Phase 1) complete:
   - Repository structure with essential files (README, LICENSE, .gitignore)
   - Backend Go module initialized
-  - Frontend React/TypeScript with Vite setup
+  - Frontend React/TypeScript with Vite, Tailwind CSS, and Shadcn UI setup
   - Docker Compose configuration for development environment
   - Linting and formatting tools configured
   - CI/CD pipeline established with GitHub Actions
@@ -35,9 +35,9 @@ This document summarizes the current status of the project, what is working, wha
   - Backend core development for authentication and home/user management is largely complete.
   - Implement remaining core API services for inventory management (Update and Delete for Item).
   - Location hierarchy implementation with recursive queries
-  - Frontend PWA with React and Shadcn components
-  - Barcode scanning and camera integration
-  - Search functionality with NLP capabilities
+- Frontend PWA development using React, TypeScript, Tailwind CSS, and Shadcn UI
+- Barcode scanning and camera integration
+- Search functionality with NLP capabilities
   - Visual location management system
   - Integration with external APIs (e.g., Google Books)
   - Performance optimization and security hardening
@@ -59,7 +59,6 @@ This document summarizes the current status of the project, what is working, wha
 
 ## Known Issues
 
-- **Frontend setup is currently blocked by an environment issue preventing `tailwindcss` execution.** This needs to be resolved to proceed with Shadcn setup and frontend component development.
 - Schema validation issue with the `.golangci.yml` file in the backend linter configuration. This issue persists and requires further investigation.
 - Persistent compiler error (`undefined: homeID`) in the `listItemsHandler` function in `backend/main.go` despite correct parsing and top-level import. This issue needs further investigation if it persists during build/testing.
 - Potential challenges identified:
@@ -74,6 +73,6 @@ This document summarizes the current status of the project, what is working, wha
 - Original storage concept was merged into a unified location entity for better flexibility
 - Implementation approach shifted to a more progressive model, focusing on core functionality first
 - Decision to use direct SQL over ORM made based on performance and debugging considerations
-- Frontend architectural decisions guided by the need for PWA capabilities and responsive design
+- Frontend architectural decisions guided by the need for PWA capabilities and responsive design, leveraging Tailwind CSS for styling and Shadcn UI for components.
 - Corrected the Go module name to "github.com/m-cain/mnemo" and relocated the `go.mod` file to the project root for proper module management.
 - Modularized backend routing to improve maintainability and optimize for LLM context window minimization

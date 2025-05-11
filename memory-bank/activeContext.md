@@ -15,11 +15,11 @@ This document tracks the current focus of work, recent changes, and immediate ne
 
 - Completed Phase 1: Project Initialization & Setup
 - Created project repository structure with essential files
-- Initialized backend (Go module) and frontend (React with TypeScript and Vite)
-- Set up development environment with Docker Compose for database and backend services
-- Configured linting and formatting tools (ESLint, Prettier for frontend)
-- Established CI/CD pipeline using GitHub Actions
-- Created documentation for development setup
+- Reset and re-initialized frontend project with Vite, React, TypeScript, Tailwind CSS, and Shadcn UI.
+- Set up development environment with Docker Compose for database and backend services.
+- Configured linting and formatting tools (ESLint, Prettier for frontend).
+- Established CI/CD pipeline using GitHub Actions.
+- Created documentation for development setup.
 - Completed database schema migrations for `homes`, `home_users`, and `locations` tables.
 - Implemented core authentication logic (registration and login) in `backend/auth/auth.go`.
 - Set up base backend API structure in `backend/main.go` with Chi router and registered auth routes.
@@ -39,11 +39,7 @@ This document tracks the current focus of work, recent changes, and immediate ne
 - Backend core development for authentication and home/user management is largely complete.
 - Implement core API services for inventory management.
 - Implement location hierarchy logic.
-- **Frontend setup is currently blocked by an environment issue preventing `tailwindcss` execution.** Need to resolve this before proceeding with Shadcn setup and frontend component development.
-- **Resolve frontend `tailwindcss` environment issue (Highest Priority).** This is blocking Shadcn setup and frontend component development.
-- If frontend remains blocked, continue backend development:
-  - Implement remaining CRUD operations for Item (Update, Delete).
-  - Implement location hierarchy logic.
+- Begin developing frontend components using React, TypeScript, Tailwind CSS, and Shadcn UI.
 - Investigate backend `.golangci.yml` schema validation issue.
 
 ## Active Decisions and Considerations
@@ -60,7 +56,7 @@ This document tracks the current focus of work, recent changes, and immediate ne
 - Backend using Chi router for RESTful API endpoints
 - Service-oriented architecture separating business logic
 - Direct use of pgx for database access without ORM layers
-- React with TypeScript and Shadcn for frontend development
+- React with TypeScript, Tailwind CSS, and Shadcn UI for frontend development
 - Test-driven development approach for core functionalities
 
 ## Learnings and Insights
