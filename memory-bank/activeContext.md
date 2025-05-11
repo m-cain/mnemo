@@ -9,6 +9,7 @@ This document tracks the current focus of work, recent changes, and immediate ne
 - Developing authentication system
 - Implementing inventory management APIs
 - Creating frontend components for core functionality
+- Modularizing backend routing by moving route definitions and handlers from `backend/main.go` to a new `backend/router` package
 
 ## Recent Changes
 
@@ -30,6 +31,8 @@ This document tracks the current focus of work, recent changes, and immediate ne
 - Implemented backend CRUD operations for ItemType (List, Create, Get by ID, Update, Delete).
 - Started implementing backend CRUD operations for Item (Implemented Create and Get by ID).
 - Integrated new inventory handlers and routes into `backend/main.go`.
+- Modularized backend routing by moving all route definitions and handlers from `backend/main.go` to a new `backend/router` package with separate files per route group.
+- Refactored `backend/main.go` to be minimal, focusing on setup and server start using the new router.
 
 ## Next Steps
 
@@ -50,6 +53,7 @@ This document tracks the current focus of work, recent changes, and immediate ne
 - Decided on a progressive implementation approach, starting with core functionality
 - Planning to implement location hierarchy with recursive SQL queries
 - Considering materialized paths for optimizing location hierarchy queries
+- Modularized backend routing to improve maintainability and optimize for LLM context window minimization
 
 ## Important Patterns and Preferences
 
@@ -66,4 +70,4 @@ This document tracks the current focus of work, recent changes, and immediate ne
 - Clear separation between authentication, inventory, and location services will improve maintainability
 - Regular documentation updates in the memory bank will be crucial for project continuity
 - Correct configuration of the Go module path at the project root is essential for resolving local package imports.
-- Encountered a persistent compiler error (`undefined: homeID`) in the `listItemsHandler` function in `backend/main.go` despite correct parsing and top-level import. This issue needs further investigation if it persists during build/testing.
+- Modularizing backend routing significantly improves code organization and LLM context window efficiency.

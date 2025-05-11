@@ -26,6 +26,8 @@ This document summarizes the current status of the project, what is working, wha
 - Context key usage in backend is refactored to use defined constants.
 - Backend CRUD operations for ItemType (List, Create, Get by ID, Update, Delete) are implemented.
 - Backend CRUD operations for Item (Create and Get by ID) are implemented.
+- Backend routing modularized by moving all route definitions and handlers from `backend/main.go` to a new `backend/router` package with separate files per route group.
+- Refactored `backend/main.go` to be minimal, focusing on setup and server start using the new router.
 
 ## What's Left to Build
 
@@ -74,3 +76,4 @@ This document summarizes the current status of the project, what is working, wha
 - Decision to use direct SQL over ORM made based on performance and debugging considerations
 - Frontend architectural decisions guided by the need for PWA capabilities and responsive design
 - Corrected the Go module name to "github.com/m-cain/mnemo" and relocated the `go.mod` file to the project root for proper module management.
+- Modularized backend routing to improve maintainability and optimize for LLM context window minimization
