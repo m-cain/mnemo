@@ -1,6 +1,11 @@
 version: "2"
+run:
+  timeout: 5m
+
 linters:
   enable:
+    - goimports
+    - golint
     - unparam
     - unused
     - deadcode
@@ -19,8 +24,10 @@ linters:
       - third_party$
       - builtin$
       - examples$
+
 issues:
   max-issues-per-linter: 0
+
 formatters:
   enable:
     - goimports

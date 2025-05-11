@@ -41,7 +41,14 @@ This document summarizes the current status of the project, what is working, wha
   - Integration with external APIs (e.g., Google Books)
   - Performance optimization and security hardening
   - Documentation and deployment guides
-- Implement PUT quantity route for items.
+- Implement location hierarchy with recursive queries
+- Frontend PWA development using React, TypeScript, Tailwind CSS, and Shadcn UI
+- Barcode scanning and camera integration
+- Search functionality with NLP capabilities
+  - Visual location management system
+  - Integration with external APIs (e.g., Google Books)
+  - Performance optimization and security hardening
+  - Documentation and deployment guides
 
 ## Current Status
 
@@ -53,6 +60,7 @@ This document summarizes the current status of the project, what is working, wha
   - Implemented CRUD operations for ItemType.
   - Implemented Create, Get by ID, Update, and Delete operations for Item.
   - Modularized backend routing.
+  - Defined and implemented a standard for "Not Found" errors using `apperrors.ErrNotFound`.
 - Project repository created with the following components:
   - Go 1.24 backend with initial module setup
   - React/TypeScript frontend with Vite

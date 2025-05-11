@@ -36,13 +36,14 @@ This document tracks the current focus of work, recent changes, and immediate ne
 - Implemented `UpdateItem` and `DeleteItem` functions in `backend/inventory/inventory.go`.
 - Added handlers and registered routes for updating and deleting items in `backend/router/inventory_item_routes.go`.
 - Corrected `pgx` import path in `backend/inventory/inventory.go` and `backend/router/inventory_item_routes.go`.
+- Resolved `.golangci.yml` schema validation issue.
+- Implemented PUT quantity route for items in the backend.
+- Defined and implemented a standard for "Not Found" errors in the backend using `apperrors.ErrNotFound`.
 
 ## Next Steps
 
 - Implement location hierarchy logic in the backend.
 - Begin developing frontend components using React, TypeScript, Tailwind CSS, and Shadcn UI.
-- Investigate backend `.golangci.yml` schema validation issue.
-- Implement PUT quantity route for items.
 
 ## Active Decisions and Considerations
 

@@ -2,12 +2,14 @@ package router
 
 import (
 	"encoding/json"
+	"errors" // Import the errors package
 	"log"
 	"net/http"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5"
+	"github.com/m-cain/mnemo/backend/apperrors" // Import the apperrors package
 	"github.com/m-cain/mnemo/backend/auth"
 	"github.com/m-cain/mnemo/backend/contextkey"
 	"github.com/m-cain/mnemo/backend/home"
@@ -26,8 +28,42 @@ func RegisterInventoryItemRoutes(r chi.Router, inventoryService *inventory.Inven
 		r.Get("/{itemID}", getItemByIDHandler(inventoryService))
 		r.Put("/{itemID}", updateItemHandler(inventoryService))
 		r.Delete("/{itemID}", deleteItemHandler(inventoryService))
-		// TODO: Add PUT quantity route
+		r.Put("/{itemID}/quantity", updateItemQuantityHandler(inventoryService))
 	})
+}
+
+// updateItemQuantityHandler returns a http.HandlerFunc that updates the quantity of an existing item.
+func updateItemQuantityHandler(inventoryService *inventory.InventoryService) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		itemIDStr := chi.URLParam(r, "itemID")
+		itemID, err := uuid.Parse(itemIDStr)
+		if err != nil {
+			http.Error(w, "Invalid item ID format", http.StatusBadRequest)
+			return
+		}
+
+		var req struct {
+			Quantity int `json:"quantity"`
+		}
+		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+			http.Error(w, "Invalid request body", http.StatusBadRequest)
+			return
+		}
+
+		err = inventoryService.UpdateItemQuantity(r.Context(), itemID, req.Quantity)
+		if err != nil {
+			if err == pgx.ErrNoRows {
+				http.Error(w, "Item not found", http.StatusNotFound)
+				return
+			}
+			http.Error(w, "Failed to update item quantity", http.StatusInternalServerError)
+			log.Printf("Error updating item quantity: %v", err)
+			return
+		}
+
+		w.WriteHeader(http.StatusOK)
+		json.NewEncoder(w).Encode(map[string]string{"message": "Item quantity updated successfully"})
+	}
 }
 
 // listItemsHandler returns a http.HandlerFunc that lists items for a given home.
@@ -107,13 +143,12 @@ func getItemByIDHandler(inventoryService *inventory.InventoryService) http.Handl
 
 		item, err := inventoryService.GetItemByID(r.Context(), itemID)
 		if err != nil {
+			if errors.Is(err, apperrors.ErrNotFound) {
+				http.Error(w, "Item not found", http.StatusNotFound)
+				return
+			}
 			http.Error(w, "Failed to get item", http.StatusInternalServerError)
 			log.Printf("Error getting item by ID: %v", err)
-			return
-		}
-
-		if item == nil {
-			http.Error(w, "Item not found", http.StatusNotFound)
 			return
 		}
 

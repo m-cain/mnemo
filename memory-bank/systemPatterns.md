@@ -51,3 +51,45 @@ With Phase 1 complete, we have established the foundational infrastructure for t
 - **Frontend Integration Path:** Seamless PWA operation, robust API communication, and responsive state updates.
 - **Data Migration and Backup Path:** Regular, automated migration and backup operations ensuring data consistency and recoverability.
 - **ML Integration Path (Future):** Clearly defined endpoints and data contracts to facilitate straightforward integration of image and barcode recognition services.
+
+## Standardized "Not Found" Error Handling
+
+To ensure consistency and clarity when a requested resource is not found, the backend uses a standardized error: `apperrors.ErrNotFound`.
+
+- **Definition:** `apperrors.ErrNotFound` is a sentinel error defined in `backend/apperrors/errors.go`.
+- **Purpose:** It provides a distinct error value to signal that a specific resource could not be located, avoiding ambiguous `nil, nil` return values in such scenarios.
+- **Usage in Service Layer:**
+  - Service methods that attempt to retrieve a single resource by ID (or similar unique identifier) should return `nil, apperrors.ErrNotFound` if the resource is not found in the data layer (e.g., if a database query returns `pgx.ErrNoRows`).
+  - Example:
+    ```go
+    func (s *InventoryService) GetItemByID(ctx context.Context, id uuid.UUID) (*models.Item, error) {
+        // ... database query ...
+        if err == pgx.ErrNoRows {
+            return nil, apperrors.ErrNotFound // Resource not found
+        }
+        if err != nil {
+            return nil, fmt.Errorf("failed to query item: %w", err) // Handle other errors
+        }
+        // ... return resource, nil
+    }
+    ```
+- **Usage in Handler Layer (or calling code):** - Code that calls service methods should check for `apperrors.ErrNotFound` using `errors.Is()`. - If the error is `apperrors.ErrNotFound`, the calling code should handle it appropriately, such as returning an HTTP 404 Not Found response from an HTTP handler. - Example:
+  `go
+      func getItemByIDHandler(inventoryService *inventory.InventoryService) http.HandlerFunc {
+          return func(w http.ResponseWriter, r *http.Request) {
+              // ... get itemID ...
+              item, err := inventoryService.GetItemByID(r.Context(), itemID)
+              if err != nil {
+                  if errors.Is(err, apperrors.ErrNotFound) {
+                      http.Error(w, "Item not found", http.StatusNotFound) // Return 404
+                      return
+                  }
+                  http.Error(w, "Internal server error", http.StatusInternalServerError) // Handle other errors
+                  log.Printf("Error getting item by ID: %v", err)
+                  return
+              }
+              // ... respond with item
+          }
+      }
+      `
+  This standard promotes consistency and makes error handling for "not found" scenarios explicit and easier to manage.

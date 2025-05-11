@@ -4,7 +4,7 @@ This document outlines the technologies used, the development setup, technical c
 
 ## Technologies Used
 
-- **Backend:** Go 1.24
+- **Backend:** Go 1.24, including the `apperrors` package for standardized application errors.
 - **HTTP Framework:** Chi v5
 - **Database:** PostgreSQL 17
 - **Database Access:** pgx v5

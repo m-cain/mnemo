@@ -7,6 +7,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
+	"github.com/m-cain/mnemo/backend/apperrors"
 	"github.com/m-cain/mnemo/backend/models"
 )
 
@@ -135,6 +136,22 @@ func (s *InventoryService) DeleteItemType(ctx context.Context, id uuid.UUID) err
 	return nil
 }
 
+// UpdateItemQuantity updates the quantity of an existing item in the database.
+func (s *InventoryService) UpdateItemQuantity(ctx context.Context, id uuid.UUID, quantity int) error {
+	query := `UPDATE items SET quantity = $1, updated_at = CURRENT_TIMESTAMP WHERE id = $2`
+
+	result, err := s.db.Exec(ctx, query, quantity, id)
+	if err != nil {
+		return fmt.Errorf("failed to update item quantity: %w", err)
+	}
+
+	if result.RowsAffected() == 0 {
+		return pgx.ErrNoRows // Item not found
+	}
+
+	return nil
+}
+
 // CreateItem creates a new item in the database.
 func (s *InventoryService) CreateItem(ctx context.Context, item models.Item) (*models.Item, error) {
 	query := `INSERT INTO items (name, quantity, unit, location_id, item_type_id, created_at, updated_at)
@@ -173,7 +190,7 @@ func (s *InventoryService) GetItemByID(ctx context.Context, id uuid.UUID) (*mode
 	err := s.db.QueryRow(ctx, query, id).Scan(&item.ID, &item.Name, &item.Quantity, &item.Unit, &item.LocationID, &item.ItemTypeID, &item.CreatedAt, &item.UpdatedAt)
 	if err != nil {
 		if err == pgx.ErrNoRows {
-			return nil, nil // Item not found
+			return nil, apperrors.ErrNotFound // Item not found
 		}
 		return nil, fmt.Errorf("failed to query item by ID: %w", err)
 	}
