@@ -1,4 +1,8 @@
-import { createRootRoute, createRouter } from "@tanstack/react-router";
+import {
+  createRootRoute,
+  createRoute,
+  createRouter,
+} from "@tanstack/react-router";
 import { lazy } from "react";
 import { isAuthenticated } from "../lib/apiClient";
 
@@ -24,27 +28,29 @@ const CreateItemForm = lazy(
 const AppLayout = lazy(() => import("../components/layout/AppLayout"));
 const AuthLayout = lazy(() => import("../components/layout/AuthLayout"));
 
-// Root route
-export const rootRoute = createRootRoute();
+// Define routes
+const rootRoute = createRootRoute();
 
-// Auth routes
-export const authLayoutRoute = rootRoute.createRoute({
+const authLayoutRoute = createRoute({
+  getParentRoute: () => rootRoute,
   id: "auth",
   component: AuthLayout,
 });
 
-export const loginRoute = authLayoutRoute.createRoute({
+const loginRoute = createRoute({
+  getParentRoute: () => authLayoutRoute,
   path: "/login",
   component: Login,
 });
 
-export const registerRoute = authLayoutRoute.createRoute({
+const registerRoute = createRoute({
+  getParentRoute: () => authLayoutRoute,
   path: "/register",
   component: Register,
 });
 
-// Protected routes
-export const appLayoutRoute = rootRoute.createRoute({
+const appLayoutRoute = createRoute({
+  getParentRoute: () => rootRoute,
   id: "app",
   component: AppLayout,
   beforeLoad: async () => {
@@ -60,24 +66,26 @@ export const appLayoutRoute = rootRoute.createRoute({
   },
 });
 
-// Dashboard route
-export const dashboardRoute = appLayoutRoute.createRoute({
+const dashboardRoute = createRoute({
+  getParentRoute: () => appLayoutRoute,
   path: "/",
   component: Dashboard,
 });
 
-// Inventory routes
-export const inventoryRoute = appLayoutRoute.createRoute({
+const inventoryRoute = createRoute({
+  getParentRoute: () => appLayoutRoute,
   path: "/inventory",
   component: ItemList,
 });
 
-export const inventoryDetailRoute = appLayoutRoute.createRoute({
+const inventoryDetailRoute = createRoute({
+  getParentRoute: () => appLayoutRoute,
   path: "/inventory/$itemId",
   component: ItemDetail,
 });
 
-export const inventoryCreateRoute = appLayoutRoute.createRoute({
+const inventoryCreateRoute = createRoute({
+  getParentRoute: () => appLayoutRoute,
   path: "/inventory/new",
   component: CreateItemForm,
 });

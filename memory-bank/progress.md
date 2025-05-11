@@ -14,6 +14,11 @@
 
 ## Recently Completed
 
+- **Fixed TanStack Router Syntax Errors**:
+
+  - Updated route definitions in `frontend/src/router/index.ts` to use `createRoute` and `getParentRoute` for nested routes.
+  - Resolved TypeScript errors related to incorrect route creation syntax.
+
 - **Implemented Form Validation with Zod**:
 
   - Added Zod validation schemas for item forms and quantity adjustments

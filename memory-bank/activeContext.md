@@ -138,6 +138,10 @@ The inventory management UI now includes:
 - Used Perplexity to research correct Tailwind CSS configuration with Vite, which indicated using `@tailwindcss/vite` and updating `vite.config.ts`.
 - Attempted to install `@tailwindcss/vite` and update `vite.config.ts`, but still encountered PostCSS errors related to `@tailwindcss/postcss` being required in `postcss.config.js`.
 - **Resolved Tailwind CSS with Vite Configuration:** The user independently resolved the issue by installing `tailwindcss` and `@tailwindcss/vite` and removing the `postcss.config.js` file. The configuration is now handled directly in `vite.config.ts`.
+- Encountered TypeScript errors related to TanStack Router's route definition syntax ("Property 'createRoute' does not exist").
+- Initially attempted to use `new Route` based on outdated documentation.
+- Used Perplexity to find the latest documentation and examples for code-based routing with nested routes.
+- **Resolved TanStack Router Syntax:** Updated the routing configuration in `frontend/src/router/index.ts` to use the `createRoute` function for all routes and define nesting using the `getParentRoute` option, based on the latest documentation.
 
 ## User Experience Focus
 
