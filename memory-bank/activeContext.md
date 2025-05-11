@@ -126,10 +126,18 @@ The inventory management UI now includes:
 - Using Zod for form validation to ensure type safety and consistent validation
 - Using react-hook-form for form state management and validation integration
 - Using shadcn/ui for component library to ensure consistent styling and functionality
-- Using relative imports (../../../) instead of alias imports (@/) to avoid path resolution issues
+- Using relative imports (../../../) instead of alias imports (@/) to avoid path resolution issues. This was addressed by creating and running a script to update imports in the `frontend/src/components/ui` directory.
 - Implementing type-safe React event handlers
 - Utilized the 21st-dev Magic MCP server for generating sophisticated UI components
 - Using FormField rendering pattern with render props for better component isolation
+
+## Recent Issues and Troubleshooting
+
+- Encountered issues with frontend development server startup related to PostCSS and Tailwind CSS configuration.
+- Attempted to fix by installing `tw-animate-css` and `@tailwindcss/postcss`.
+- Used Perplexity to research correct Tailwind CSS configuration with Vite, which indicated using `@tailwindcss/vite` and updating `vite.config.ts`.
+- Attempted to install `@tailwindcss/vite` and update `vite.config.ts`, but still encountered PostCSS errors related to `@tailwindcss/postcss` being required in `postcss.config.js`.
+- **Resolved Tailwind CSS with Vite Configuration:** The user independently resolved the issue by installing `tailwindcss` and `@tailwindcss/vite` and removing the `postcss.config.js` file. The configuration is now handled directly in `vite.config.ts`.
 
 ## User Experience Focus
 

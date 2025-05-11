@@ -61,6 +61,14 @@
 - Improving home selection UI
 - Adding pagination for large datasets
 
+## Recent Issues and Troubleshooting
+
+- Encountered issues with frontend development server startup related to PostCSS and Tailwind CSS configuration.
+- Attempted to fix by installing `tw-animate-css` and `@tailwindcss/postcss`.
+- Used Perplexity to research correct Tailwind CSS configuration with Vite, which indicated using `@tailwindcss/vite` and updating `vite.config.ts`.
+- Attempted to install `@tailwindcss/vite` and update `vite.config.ts`, but still encountered PostCSS errors related to `@tailwindcss/postcss` being required in `postcss.config.js`.
+- **Resolved Tailwind CSS with Vite Configuration:** The user independently resolved the issue by installing `tailwindcss` and `@tailwindcss/vite` and removing the `postcss.config.js` file. The configuration is now handled directly in `vite.config.ts`.
+
 ## Recently Completed
 
 - **Implemented Inventory Visualizations**:
