@@ -135,6 +135,7 @@ The inventory management UI now includes:
 - Implementing type-safe React event handlers
 - Utilized the 21st-dev Magic MCP server for generating sophisticated UI components
 - Using FormField rendering pattern with render props for better component isolation
+- Updated development process to run backend and frontend independently, using Docker Compose only for the database, and added a Makefile for convenience.
 
 ## Recent Issues and Troubleshooting
 

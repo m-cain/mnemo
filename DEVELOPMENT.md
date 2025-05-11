@@ -41,26 +41,23 @@ This document provides instructions on how to set up and run the Mnemo project f
 
 ## Running the Development Environment
 
-1. Ensure Docker is running.
-2. From the project root directory (`/Users/matt/src/mnemo`), start the Docker Compose services (database and backend):
+The project now uses a Makefile to simplify starting the various components. Ensure Docker is running before starting the database.
 
-   ```bash
-   docker-compose up --build db backend
-   ```
+From the project root directory (`/Users/matt/src/mnemo`), you can use the following `make` commands:
 
-   This will build the backend development image, start the database container, and start the backend application with hot-reloading enabled via Air.
+- `make db`: Starts only the PostgreSQL database container using Docker Compose.
+- `make backend`: Navigates to the `backend` directory and starts the Go backend server using `air` for hot-reloading.
+- `make frontend`: Navigates to the `frontend` directory and starts the frontend development server using `npm run dev`.
+- `make all`: Starts the database, backend, and frontend concurrently.
+- `make clean`: Stops and removes the Docker containers defined in `docker-compose.yml`.
 
-3. In a separate terminal, navigate to the `frontend` directory:
-   ```bash
-   cd frontend
-   ```
-4. Start the frontend development server:
-   ```bash
-   npm run dev # or yarn dev
-   ```
-   This will start the Vite development server, typically at `http://localhost:5173`.
+To start the full development environment, run:
 
-The backend should be accessible at `http://localhost:8080` (or the port specified in `docker-compose.yml`), and the frontend development server will proxy API requests to the backend.
+```bash
+make all
+```
+
+The backend will be accessible at `http://localhost:8080` (or the port configured in the backend code), and the frontend development server will typically be at `http://localhost:5173`. The frontend development server will proxy API requests to the backend.
 
 ## Database Migrations
 

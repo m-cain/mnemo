@@ -21,8 +21,10 @@ This document outlines the technologies used, the development setup, technical c
   - Go 1.24 installed locally
   - PostgreSQL 17 database running in Docker container
   - Air for hot-reloading during development
-  - Docker Compose for orchestrating services
-  - GitHub Actions for CI/CD pipeline
+
+- Docker Compose for the database service
+- Makefile for orchestrating development services (database, backend, frontend)
+- GitHub Actions for CI/CD pipeline
 
 - **Frontend Environment:**
 

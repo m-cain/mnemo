@@ -125,7 +125,8 @@ Note: When triggered by **update memory bank**, I MUST review every memory bank 
 
 REMEMBER: After every memory reset, I begin completely fresh. The Memory Bank is my only link to previous work. It must be maintained with precision and clarity, as my effectiveness depends entirely on its accuracy.
 
-## Coding Style Rules
+## Cline Rules
 
+- **Default Service Ports**: Always assume relevant services are running on their default ports (e.g., 5173 for frontend, Air's default for the backend). If it appears this is not the case, check with the user to clarify where the service should be running.
 - **Go Import Comments**: Do not add comments directly after a Go import statement that only describe the imported package (e.g., `import "fmt" // Import fmt`). Such comments are redundant and should be avoided.
 - **Frontend Dependencies**: Always use the latest versions of TanStack Query and TanStack Router.
