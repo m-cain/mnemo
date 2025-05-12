@@ -1,3 +1,4 @@
+-- +goose Up
 CREATE TABLE home_users (
     home_id UUID REFERENCES homes(id),
     user_id UUID REFERENCES users(id),
@@ -5,3 +6,6 @@ CREATE TABLE home_users (
     joined_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
     PRIMARY KEY (home_id, user_id)
 );
+
+-- +goose Down
+DROP TABLE home_users;

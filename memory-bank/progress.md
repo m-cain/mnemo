@@ -45,7 +45,7 @@
 - **Improved Create Item Form**:
   - Organized sections for better information hierarchy
   - Enhanced validation with field-level error messages
-  - Added helpful tips card with guidance for users
+  - Added a helpful tips card with guidance for users
   - Better form submission feedback and loading states
 - **Enhanced Inventory List Page**:
   - Statistics dashboard showing total quantities, item types, locations, and low stock items
@@ -59,23 +59,6 @@
   - Used the 21st-dev Magic MCP server for generating sophisticated UI components
   - Refactored the quantity adjustment dialog with modern form patterns
   - Implemented improved form validation error handling with proper field-level error messaging
-
-## Current Development Focus
-
-- Implementing bulk operations (import/export, batch editing)
-- Improving home selection UI
-- Adding pagination for large datasets
-
-## Recent Issues and Troubleshooting
-
-- Encountered issues with frontend development server startup related to PostCSS and Tailwind CSS configuration.
-- Attempted to fix by installing `tw-animate-css` and `@tailwindcss/postcss`.
-- Used Perplexity to research correct Tailwind CSS configuration with Vite, which indicated using `@tailwindcss/vite` and updating `vite.config.ts`.
-- Attempted to install `@tailwindcss/vite` and update `vite.config.ts`, but still encountered PostCSS errors related to `@tailwindcss/postcss` being required in `postcss.config.js`.
-- **Resolved Tailwind CSS with Vite Configuration:** The user independently resolved the issue by installing `tailwindcss` and `@tailwindcss/vite` and removing the `postcss.config.js` file. The configuration is now handled directly in `vite.config.ts`.
-
-## Recently Completed
-
 - **Implemented Inventory Visualizations**:
 
   - Created interactive charts using Recharts library
@@ -105,6 +88,21 @@
 - Improved LoginPage UI:
   - Adjusted global styles in `index.css` to ensure the background fills the entire page and the auth card remains centered.
   - Removed conflicting hardcoded button background styles in `index.css` to fix the invisible button text in light mode.
+- **Migrated database migration tool from `go-migrate` to `goose`:** Installed `goose` CLI, created `backend/dbconf.yml`, converted existing migration files to `goose` format, and updated the `Makefile` and documentation.
+
+## Current Development Focus
+
+- Implementing bulk operations (import/export, batch editing)
+- Improving home selection UI
+- Adding pagination for large datasets
+
+## Recent Issues and Troubleshooting
+
+- Encountered issues with frontend development server startup related to PostCSS and Tailwind CSS configuration.
+- Attempted to fix by installing `tw-animate-css` and `@tailwindcss/postcss`.
+- Used Perplexity to research correct Tailwind CSS configuration with Vite, which indicated using `@tailwindcss/vite` and updating `vite.config.ts`.
+- Attempted to install `@tailwindcss/vite` and update `vite.config.ts`, but still encountered PostCSS errors related to `@tailwindcss/postcss` being required in `postcss.config.js`.
+- **Resolved Tailwind CSS with Vite Configuration:** The user independently resolved the issue by installing `tailwindcss` and `@tailwindcss/vite` and removing the `postcss.config.js` file. The configuration is now handled directly in `vite.config.ts`.
 
 ## Known Issues
 

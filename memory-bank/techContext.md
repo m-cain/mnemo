@@ -8,7 +8,7 @@ This document outlines the technologies used, the development setup, technical c
 - **HTTP Framework:** Chi v5
 - **Database:** PostgreSQL 17
 - **Database Access:** pgx v5
-- **Migration Tool:** golang-migrate
+- **Migration Tool:** goose
 - **Frontend:** React with TypeScript, TanStack Query for data fetching, and TanStack Router for routing (using the latest `createRoute` syntax for defining routes)
 - **UI Components:** Shadcn
 - **Styling:** Tailwind CSS
@@ -21,9 +21,10 @@ This document outlines the technologies used, the development setup, technical c
   - Go 1.24 installed locally
   - PostgreSQL 17 database running in Docker container
   - Air for hot-reloading during development
+  - goose CLI installed (`go install github.com/pressly/goose/v3/cmd/goose@latest`)
 
 - Docker Compose for the database service
-- Makefile for orchestrating development services (database, backend, frontend)
+- Makefile for orchestrating development services (database, backend, frontend, migrations)
 - GitHub Actions for CI/CD pipeline
 
 - **Frontend Environment:**
@@ -39,6 +40,7 @@ This document outlines the technologies used, the development setup, technical c
   - Docker and Docker Compose for containerization
   - VS Code (recommended IDE)
   - golangci-lint for backend code quality (with configuration issues noted that require further investigation)
+  - goose CLI for database migrations
 
 ## Technical Constraints
 
@@ -62,7 +64,7 @@ This document outlines the technologies used, the development setup, technical c
 
   - chi v5: minimal HTTP router
   - pgx v5: PostgreSQL driver
-  - golang-migrate: database schema management
+  - goose: database schema management
 
 - **Frontend:**
 
@@ -88,7 +90,7 @@ This document outlines the technologies used, the development setup, technical c
 
 - **Database Management:**
 
-  - Use golang-migrate to handle schema versioning and migrations
+  - Use goose CLI and `backend/dbconf.yml` to handle schema versioning and migrations via Makefile targets.
   - Regular automated backups for data security
 
 - **Testing Patterns:**

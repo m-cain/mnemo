@@ -67,6 +67,7 @@ We are developing an inventory management system with a React frontend and a Go 
 - Added statistics cards to the ItemListPage to show total items, item types, locations count, and low stock items
 - Implemented search functionality with item type filtering
 - Enhanced the inventory table with better organization and styling
+- **Migrated database migration tool from `go-migrate` to `goose`:** Installed `goose` CLI, created `backend/dbconf.yml`, converted existing migration files to `goose` format, and updated the `Makefile` and documentation.
 
 ## UI Component Structure
 
@@ -106,7 +107,7 @@ The inventory management UI now includes:
 4. CreateItemForm:
    - Two-column layout with form and tips cards
    - Organized sections for different types of information
-   - Improved validation with field-level feedback
+   - Enhanced validation with field-level feedback
    - Clear required field indicators
    - Guidance tips for better user experience
 5. Chart Components:
@@ -136,6 +137,7 @@ The inventory management UI now includes:
 - Utilized the 21st-dev Magic MCP server for generating sophisticated UI components
 - Using FormField rendering pattern with render props for better component isolation
 - Updated development process to run backend and frontend independently, using Docker Compose only for the database, and added a Makefile for convenience.
+- Migrated database migration tool from `go-migrate` to `goose`.
 
 ## Recent Issues and Troubleshooting
 

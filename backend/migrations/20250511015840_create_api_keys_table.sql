@@ -1,3 +1,4 @@
+-- +goose Up
 CREATE TABLE api_keys (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     key VARCHAR(255) NOT NULL UNIQUE,
@@ -9,3 +10,6 @@ CREATE TABLE api_keys (
 );
 
 CREATE INDEX idx_api_keys_key ON api_keys(key);
+
+-- +goose Down
+DROP TABLE api_keys;

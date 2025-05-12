@@ -23,7 +23,7 @@ With Phase 1 complete, we have established the foundational infrastructure for t
 
 - **Backend Language:** Go 1.24, chosen for its performance, simplicity, concurrency capabilities, and robust ecosystem.
 - **Database:** PostgreSQL 17, selected for reliability, robust data integrity, advanced querying capabilities, and performance.
-- **Migration Tool:** golang-migrate, chosen for straightforward version control and automation of database schema changes.
+- **Migration Tool:** goose, chosen for its ease of integration and support for SQL migrations.
 - **Frontend Stack:** React with TypeScript for maintainability, reliability, and developer experience, combined with Shadcn UI and Tailwind CSS for rapid, consistent UI development and styling.
 - **HTTP Framework:** Chi v5, selected due to its minimalistic design, ease of use, middleware support, and strong community.
 - **Data Access:** Direct usage of pgx v5, avoiding ORM and repository patterns to simplify debugging, optimize performance, and increase control over SQL.
@@ -75,21 +75,21 @@ To ensure consistency and clarity when a requested resource is not found, the ba
     ```
 - **Usage in Handler Layer (or calling code):** - Code that calls service methods should check for `apperrors.ErrNotFound` using `errors.Is()`. - If the error is `apperrors.ErrNotFound`, the calling code should handle it appropriately, such as returning an HTTP 404 Not Found response from an HTTP handler. - Example:
   `go
-    func getItemByIDHandler(inventoryService *inventory.InventoryService) http.HandlerFunc {
-        return func(w http.ResponseWriter, r *http.Request) {
-            // ... get itemID ...
-            item, err := inventoryService.GetItemByID(r.Context(), itemID)
-            if err != nil {
-                if errors.Is(err, apperrors.ErrNotFound) {
-                    http.Error(w, "Item not found", http.StatusNotFound) // Return 404
-                    return
-                }
-                http.Error(w, "Internal server error", http.StatusInternalServerError) // Handle other errors
-                log.Printf("Error getting item by ID: %v", err)
-                return
-            }
-            // ... respond with item
-        }
-    }
-    `
+  func getItemByIDHandler(inventoryService *inventory.InventoryService) http.HandlerFunc {
+      return func(w http.ResponseWriter, r *http.Request) {
+          // ... get itemID ...
+          item, err := inventoryService.GetItemByID(r.Context(), itemID)
+          if err != nil {
+              if errors.Is(err, apperrors.ErrNotFound) {
+                  http.Error(w, "Item not found", http.StatusNotFound) // Return 404
+                  return
+              }
+              http.Error(w, "Internal server error", http.StatusInternalServerError) // Handle other errors
+              log.Printf("Error getting item by ID: %v", err)
+              return
+          }
+          // ... respond with item
+      }
+  }
+  `
   This standard promotes consistency and makes error handling for "not found" scenarios explicit and easier to manage.

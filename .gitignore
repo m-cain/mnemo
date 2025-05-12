@@ -15,6 +15,7 @@ _test
 _obj
 test.out
 build
+backend/tmp
 
 # Node.js
 node_modules/

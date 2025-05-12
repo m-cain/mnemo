@@ -1,3 +1,4 @@
+-- +goose Up
 CREATE TABLE locations (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     home_id UUID NOT NULL REFERENCES homes(id),
@@ -8,3 +9,6 @@ CREATE TABLE locations (
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
+
+-- +goose Down
+DROP TABLE locations;

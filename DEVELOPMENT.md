@@ -8,6 +8,7 @@ This document provides instructions on how to set up and run the Mnemo project f
 - Go 1.24
 - Node.js (LTS version recommended)
 - npm or yarn
+- goose CLI (`go install github.com/pressly/goose/v3/cmd/goose@latest`)
 
 ## Backend Setup
 
@@ -61,7 +62,18 @@ The backend will be accessible at `http://localhost:8080` (or the port configure
 
 ## Database Migrations
 
-Database schema migrations are handled by `golang-migrate`. Instructions for running migrations will be added in a later phase.
+Database schema migrations are handled by `goose`. The migration files are located in the `backend/migrations` directory and are configured using the `backend/dbconf.yml` file.
+
+You can use the following `make` commands from the project root directory (`/Users/matt/src/mnemo`) to manage database migrations:
+
+- `make migrate-create`: Creates a new blank SQL migration file in the `backend/migrations` directory with a timestamp prefix. You will be prompted to enter the migration name.
+- `make migrate-up`: Applies all pending migrations to the database.
+- `make migrate-down-one`: Rolls back the last applied migration.
+- `make migrate-down-to`: Rolls back migrations to a specific version. You will be prompted to enter the target version.
+- `make migrate-status`: Shows the status of all migrations (applied or pending).
+- `make migrate-version`: Displays the current database version.
+
+Before running any migration commands, ensure your PostgreSQL database is running (e.g., using `make db`).
 
 ## Linting and Formatting
 
