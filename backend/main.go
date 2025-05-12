@@ -3,20 +3,22 @@ package main
 import (
 	"context"
 	"database/sql"
+	"embed" // Add embed import
 	"log"
 	"net/http"
 	"os"
 
-	"github.com/golang-migrate/migrate/v4"
-	migrate_postgres "github.com/golang-migrate/migrate/v4/database/postgres"
-	_ "github.com/golang-migrate/migrate/v4/source/file"
 	"github.com/jackc/pgx/v5/pgxpool"
 	_ "github.com/jackc/pgx/v5/stdlib"
 	"github.com/m-cain/mnemo/backend/auth"
 	"github.com/m-cain/mnemo/backend/home"
 	"github.com/m-cain/mnemo/backend/inventory"
 	"github.com/m-cain/mnemo/backend/router"
+	"github.com/pressly/goose/v3"
 )
+
+//go:embed migrations/*.sql
+var embedMigrations embed.FS
 
 func main() {
 	// Load environment variables
@@ -44,21 +46,21 @@ func main() {
 	}
 	log.Println("Database connection pool established!")
 
-	// Run database migrations using standard sql.DB connection
+	// Run database migrations using goose
 	dbMigrate, err := sql.Open("pgx", dbURL) // Use sql.Open with pgx stdlib driver
 	if err != nil {
 		log.Fatalf("Unable to connect to database for migrations: %v\n", err)
 	}
 	defer dbMigrate.Close()
 
-	m, err := migrate.NewWithDatabaseInstance(
-		"file://backend/migrations",
-		"postgres", &migrate_postgres.Postgres{}) // Use the imported instance
-	if err != nil {
-		log.Fatal(err)
+	goose.SetBaseFS(embedMigrations) // Set the base file system
+
+	if err := goose.SetDialect("postgres"); err != nil { // Set the dialect
+		log.Fatalf("goose: failed to set dialect: %v", err)
 	}
-	if err := m.Up(); err != nil && err != migrate.ErrNoChange {
-		log.Printf("Database migrations failed or no change: %v", err)
+
+	if err := goose.Up(dbMigrate, "migrations"); err != nil { // Run migrations
+		log.Fatalf("goose: migrations failed: %v", err)
 	} else {
 		log.Println("Database migrations applied successfully!")
 	}

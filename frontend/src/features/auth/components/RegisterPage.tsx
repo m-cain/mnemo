@@ -32,16 +32,13 @@ export default function RegisterPage() {
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   // Initialize form with React Hook Form and Zod validation
   const form = useForm<RegistrationFormValues>({
     resolver: zodResolver(registrationSchema),
     defaultValues: {
-      name: "",
       email: "",
       password: "",
-      confirmPassword: "",
     },
   });
 
@@ -50,13 +47,9 @@ export default function RegisterPage() {
     setIsLoading(true);
 
     try {
-      // Remove confirmPassword field when sending to API
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      const { confirmPassword, ...registrationData } = values;
-
       const response = await apiClient.post<AuthResponse>(
         "/auth/register",
-        registrationData
+        values
       );
 
       // Store auth token and redirect to dashboard
@@ -96,25 +89,6 @@ export default function RegisterPage() {
               onSubmit={form.handleSubmit(handleSubmit)}
               className="space-y-4"
             >
-              <FormField
-                control={form.control}
-                name="name"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Full Name</FormLabel>
-                    <FormControl>
-                      <Input
-                        type="text"
-                        autoComplete="name"
-                        placeholder="John Doe"
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
               <FormField
                 control={form.control}
                 name="email"
@@ -163,47 +137,6 @@ export default function RegisterPage() {
                         )}
                         <span className="sr-only">
                           {showPassword ? "Hide password" : "Show password"}
-                        </span>
-                      </Button>
-                    </div>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="confirmPassword"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Confirm Password</FormLabel>
-                    <div className="relative">
-                      <FormControl>
-                        <Input
-                          type={showConfirmPassword ? "text" : "password"}
-                          autoComplete="new-password"
-                          placeholder="••••••••"
-                          {...field}
-                        />
-                      </FormControl>
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="icon"
-                        className="absolute right-0 top-0 h-10 w-10 px-0"
-                        onClick={() =>
-                          setShowConfirmPassword(!showConfirmPassword)
-                        }
-                      >
-                        {showConfirmPassword ? (
-                          <EyeOff className="h-4 w-4" />
-                        ) : (
-                          <Eye className="h-4 w-4" />
-                        )}
-                        <span className="sr-only">
-                          {showConfirmPassword
-                            ? "Hide password"
-                            : "Show password"}
                         </span>
                       </Button>
                     </div>
