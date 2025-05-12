@@ -58,7 +58,7 @@ export default function LoginPage() {
   return (
     <div className="space-y-6">
       <div className="text-center">
-        <h2 className="text-2xl font-bold text-gray-900">
+        <h2 className="text-2xl font-bold text-foreground">
           Sign in to your account
         </h2>
       </div>
@@ -115,7 +115,7 @@ export default function LoginPage() {
       </Form>
 
       <div className="text-sm text-center">
-        <p className="text-gray-600">
+        <p className="text-foreground">
           Don't have an account?{" "}
           <Link
             to="/register"

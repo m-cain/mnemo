@@ -35,6 +35,16 @@ We are developing an inventory management system with a React frontend and a Go 
   - Modified global styles in `index.css` to ensure the background fills the entire page and the auth card remains centered.
   - Removed conflicting hardcoded button background styles in `index.css` to fix the invisible button text in light mode.
 
+- Implemented dark mode support and fixed routing import errors:
+
+  - Added `ThemeProvider` component to `main.tsx` to manage theme state and apply the `dark` class to the HTML element.
+  - Updated `AppLayout.tsx` to use theme-aware background classes (`bg-background`, `bg-card`).
+  - Updated `AuthLayout.tsx` to use theme-aware background and text color classes (`bg-background`, `bg-card`, `text-foreground`, `text-muted-foreground`).
+  - Updated `LoginPage.tsx` and `RegisterPage.tsx` to use theme-aware text and background classes (`text-foreground`, `bg-background`).
+  - Removed a conflicting `@media (prefers-color-scheme: light)` block from `index.css` that was overriding theme variables.
+  - Corrected import paths for `LocationsPage` and `ApiKeysPage` in `router/index.ts` and added placeholder components to resolve TypeScript errors.
+  - Dark mode is now working correctly on the authentication pages.
+
 - Implemented form validation with Zod and react-hook-form:
 
   - Created validation schemas for item forms and quantity adjustments

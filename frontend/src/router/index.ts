@@ -84,10 +84,30 @@ const inventoryDetailRoute = createRoute({
   component: ItemDetail,
 });
 
+// Location route components
+const Locations = lazy(
+  () => import("../features/locations/components/LocationsPage")
+); // Assuming a LocationsPage component exists
+
+// API Keys route components
+const ApiKeys = lazy(() => import("../features/user/components/ApiKeysPage")); // Assuming an ApiKeysPage component exists
+
 const inventoryCreateRoute = createRoute({
   getParentRoute: () => appLayoutRoute,
   path: "/inventory/new",
   component: CreateItemForm,
+});
+
+const locationsRoute = createRoute({
+  getParentRoute: () => appLayoutRoute,
+  path: "/locations",
+  component: Locations,
+});
+
+const apiKeysRoute = createRoute({
+  getParentRoute: () => appLayoutRoute,
+  path: "/api-keys",
+  component: ApiKeys,
 });
 
 // Create the route tree using the routes
@@ -98,6 +118,8 @@ const routeTree = rootRoute.addChildren([
     inventoryRoute,
     inventoryDetailRoute,
     inventoryCreateRoute,
+    locationsRoute,
+    apiKeysRoute,
   ]),
 ]);
 

@@ -106,6 +106,7 @@
 
 ## Known Issues
 
+- Persistent "Error in route match: /app" warning in console.
 - No home selection UI implemented (currently using a placeholder)
 - Incomplete validation in some forms
 - UI is not fully responsive on all screen sizes

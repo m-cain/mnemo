@@ -169,7 +169,7 @@ export default function RegisterPage() {
           <Link
             to="/login"
             className={cn(
-              "inline-flex items-center justify-center w-full rounded-md bg-white px-4 py-2 text-sm font-medium border border-input shadow-sm hover:bg-accent focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+              "inline-flex items-center justify-center w-full rounded-md bg-background px-4 py-2 text-sm font-medium border border-input shadow-sm hover:bg-accent focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
             )}
           >
             Sign in

@@ -178,7 +178,7 @@ export default function AppLayout() {
 
       {/* Main content */}
       <div className="flex flex-col flex-1 overflow-hidden">
-        <header className="flex items-center justify-between px-6 py-4 bg-white border-b lg:hidden">
+        <header className="flex items-center justify-between px-6 py-4 bg-card border-b lg:hidden">
           <button
             className="p-1 text-gray-700"
             onClick={() => setIsSidebarOpen(true)}
